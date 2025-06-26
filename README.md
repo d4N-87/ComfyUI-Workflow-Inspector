@@ -4,8 +4,9 @@
 
 # ComfyUI Workflow Inspector
 
-<!-- Optional: Badges can go here later -->
-<!-- E.g. ![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg) -->
+<div align="center">
+  <img src="https://img.shields.io/github/license/d4N-87/ComfyUI-Workflow-Inspector?style=flat-square" alt="License Badge"/>
+</div>
 
 **Ispeziona e visualizza i metadati dei workflow ComfyUI incorporati in file PNG, WebP, MP4, FLAC e JSON con un'interfaccia intuitiva e multilingua.**
 
