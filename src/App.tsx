@@ -33,7 +33,7 @@ function App() {
   const [isAppReady, setIsAppReady] = useState(false); // IT: Flag di prontezza dell'app. EN: App readiness flag.
   const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null); // IT: ID nodo evidenziato. EN: Highlighted node ID.
 
-  const repositoryUrl = "https://github.com/LasteNight/ComfyUI-Workflow-Inspector"; 
+  const repositoryUrl = "https://github.com/d4N-87/ComfyUI-Workflow-Inspector"; 
 
   // IT: Inizializzazione dell'app: carica object_info.json e registra i nodi.
   // EN: App initialization: loads object_info.json and registers nodes.
