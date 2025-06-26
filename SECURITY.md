@@ -5,14 +5,6 @@
 🇮🇹 La versione più recente di ComfyUI-Workflow-Inspector riceverà aggiornamenti di sicurezza. Le versioni precedenti potrebbero non essere supportate attivamente.
 🇬🇧 The most recent version of ComfyUI-Workflow-Inspector will receive security updates. Older versions may not be actively supported.
 
-| Version / Versione | Supported / Supportata |
-| ------------------ | ---------------------- |
-| `main` branch / `v0.1.x`+ | :white_check_mark:     |
-| Precedenti / Older | :x:                    |
-
-*(Nota: `v0.1.x` sarà la tua prima serie di release. Il branch `main` rappresenta lo sviluppo più recente.)*
-*(Note: `v0.1.x` will be your first release series. The `main` branch represents the latest development.)*
-
 ## Reporting a Vulnerability / Segnalare una Vulnerabilità
 
 🇮🇹 La sicurezza di ComfyUI-Workflow-Inspector è importante. Se credi di aver trovato una vulnerabilità di sicurezza, ti prego di segnalarla aprendo una **Issue** nel [repository GitHub](https://github.com/d4N-87/ComfyUI-Workflow-Inspector/issues).
