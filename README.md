@@ -5,11 +5,12 @@
 # ComfyUI Workflow Inspector
 
 [![Contributors][contributors-shield]][contributors-url]
-[![Release Version Badge](https://img.shields.io/github.com/d4N-87/ComfyUI-Workflow-Inspector?style=for-the-badge)](https://github.com/d4N-87/ComfyUI-Workflow-Inspector/releases)
+[![Release Version Badge](https://img.shields.io/github/v/release/d4N-87/ComfyUI-Workflow-Inspector?style=for-the-badge)](https://github.com/d4N-87/ComfyUI-Workflow-Inspector/releases)
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
+https://img.shields.io/github/v/
 
 **Ispeziona e visualizza i metadati dei workflow ComfyUI incorporati in file PNG, WebP, MP4, FLAC e JSON con un'interfaccia intuitiva e multilingua.**
 
