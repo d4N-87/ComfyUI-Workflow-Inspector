@@ -143,9 +143,3 @@ This project is released under the **MIT** License. See the [`LICENSE`](LICENSE)
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=d4N-87/ComfyUI-Workflow-Inspector&type=Date)](https://www.star-history.com/#d4N-87/ComfyUI-Workflow-Inspector&Date)
-
----
-
-<div align="center">
-  <p>Made with ❤️ and TypeScript</p>
-</div>
