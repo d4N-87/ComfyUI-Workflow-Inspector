@@ -1,54 +1,127 @@
-# React + TypeScript + Vite
+<div align="center">
+  <img src="public/workflow_inspector_logo.webp" alt="ComfyUI Workflow Inspector Logo" width="200"/>
+</div>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# ComfyUI Workflow Inspector
 
-Currently, two official plugins are available:
+<!-- Optional: Badges can go here later -->
+<!-- E.g. ![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg) -->
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**Ispeziona e visualizza i metadati dei workflow ComfyUI incorporati in file PNG, WebP, MP4, FLAC e JSON con un'interfaccia intuitiva e multilingua.**
 
-## Expanding the ESLint configuration
+**Inspect and visualize ComfyUI workflow metadata embedded in PNG, WebP, MP4, FLAC, and JSON files with an intuitive, multilingual interface.**
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+<!-- Link to Live Demo will go here -->
+**[➡️ Prova la Demo Live! / Try the Live Demo!](#)** (Link da aggiornare)
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## ✨ Funzionalità / Features
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+*   🇮🇹 **Caricamento Intelligente**: Supporta workflow da file PNG, WebP, MP4, FLAC e JSON.
+    🇬🇧 **Smart Upload**: Supports workflows from PNG, WebP, MP4, FLAC, and JSON files.
+*   🇮🇹 **Visualizzazione Nodi**: Elenco chiaro dei nodi rilevati nel workflow.
+    🇬🇧 **Node Display**: Clear list of detected nodes in the workflow.
+*   🇮🇹 **Rendering Grafo Interattivo**: Grafo del workflow renderizzato con [LiteGraph.js](https://github.com/jagenjo/litegraph.js), con colori dei link e nomi dei nodi corretti ispirati a ComfyUI.
+    🇬🇧 **Interactive Graph Rendering**: Workflow graph rendered using [LiteGraph.js](https://github.com/jagenjo/litegraph.js), with correct ComfyUI-inspired link colors and node names.
+*   🇮🇹 **Gestione Nodi Speciali**: Supporto per Note, MarkdownNote, PrimitiveNode e Reroute.
+    🇬🇧 **Special Node Handling**: Support for Notes, MarkdownNotes, PrimitiveNodes, and Reroutes.
+*   🇮🇹 **Visualizzazione Note**: Le note del workflow (normali e Markdown) sono mostrate in una sezione dedicata.
+    🇬🇧 **Notes Display**: Workflow notes (both regular and Markdown) are shown in a dedicated section.
+*   🇮🇹 **Interfaccia Multilingua**: Disponibile in Italiano, Inglese, Francese, Tedesco e Spagnolo (IT, EN, FR, DE, ES) con selettore.
+    🇬🇧 **Multilingual Interface**: Available in Italian, English, French, German, and Spanish (IT, EN, FR, DE, ES) with a selector.
+*   🇮🇹 **Look & Feel ComfyUI**: Interfaccia utente rifinita ispirata a ComfyUI.
+    🇬🇧 **ComfyUI Look & Feel**: Polished user interface inspired by ComfyUI.
+*   🇮🇹 **Evidenziazione Interattiva**: Passando il mouse sulla lista dei nodi o sulle note si evidenzia il nodo corrispondente nel grafo.
+    🇬🇧 **Interactive Highlighting**: Hovering over the node list or notes highlights the corresponding node in the graph.
+
+## 🖼️ Anteprima / Preview
+
+<!-- Qui potremmo inserire uno screenshot o una GIF dell'applicazione -->
+<!-- We can insert a screenshot or GIF of the application here -->
+<!-- Esempio: <img src="docs/screenshot.png" alt="App Screenshot" width="700"/> -->
+<div align="center">
+  <!-- Placeholder for screenshot -->
+  <p><em>(Screenshot dell'applicazione in arrivo / Application screenshot coming soon)</em></p>
+</div>
+
+
+## 🚀 Tecnologie Utilizzate / Technologies Used
+
+*   [React](https://reactjs.org/)
+*   [Vite](https://vitejs.dev/)
+*   [TypeScript](https://www.typescriptlang.org/)
+*   [LiteGraph.js](https://github.com/jagenjo/litegraph.js)
+*   [Tailwind CSS](https://tailwindcss.com/)
+*   [i18next](https://www.i18next.com/) (per l'internazionalizzazione)
+*   [ExifReader](https://github.com/mattiasw/ExifReader) (per metadati immagini)
+*   [music-metadata-browser](https://github.com/Borewit/music-metadata-browser) (per metadati audio/video)
+
+## 🛠️ Come Eseguire Localmente / How to Run Locally
+
+1.  **Clona il repository / Clone the repository:**
+    ```bash
+    git clone https://github.com/d4N-87/ComfyUI-Workflow-Inspector.git
+    cd ComfyUI-Workflow-Inspector
+    ```
+
+2.  **Installa le dipendenze / Install dependencies:**
+    ```bash
+    npm install
+    # o / or
+    # yarn install
+    # o / or
+    # pnpm install
+    ```
+
+3.  **Avvia il server di sviluppo / Start the development server:**
+    ```bash
+    npm run dev
+    # o / or
+    # yarn dev
+    # o / or
+    # pnpm dev
+    ```
+    L'applicazione sarà disponibile su `http://localhost:5173` (o un'altra porta se 5173 è occupata).
+    The application will be available at `http://localhost:5173` (or another port if 5173 is busy).
+
+## 📖 Come Usare / How to Use
+
+1.  🇮🇹 Apri l'applicazione nel tuo browser (tramite la demo live o eseguendola localmente).
+    🇬🇧 Open the application in your browser (either via the live demo or by running it locally).
+2.  🇮🇹 Clicca sul pulsante "Carica File Workflow" (o il testo tradotto).
+    🇬🇧 Click the "Upload Workflow File" button (or its translated equivalent).
+3.  🇮🇹 Seleziona un file PNG, WebP, MP4, FLAC o JSON che contiene metadati di un workflow ComfyUI.
+    🇬🇧 Select a PNG, WebP, MP4, FLAC, or JSON file containing ComfyUI workflow metadata.
+4.  🇮🇹 L'applicazione estrarrà e visualizzerà la lista dei nodi, il grafo del workflow e le note associate.
+    🇬🇧 The application will extract and display the node list, the workflow graph, and any associated notes.
+5.  🇮🇹 Puoi cambiare la lingua dell'interfaccia usando il selettore in alto a destra.
+    🇬🇧 You can change the interface language using the selector in the top-right corner.
+
+## 🤝 Come Contribuire / How to Contribute
+
+🇮🇹 I contributi sono benvenuti! Se vuoi contribuire, per favore:
+🇬🇧 Contributions are welcome! If you'd like to contribute, please:
+
+1.  Fai un Fork del repository. / Fork the repository.
+2.  Crea un nuovo branch per la tua feature o bugfix (`git checkout -b feature/AmazingFeature` o `bugfix/IssueFix`). / Create a new branch for your feature or bugfix (`git checkout -b feature/AmazingFeature` or `bugfix/IssueFix`).
+3.  Fai commit delle tue modifiche (`git commit -m 'Add some AmazingFeature'`). / Commit your changes (`git commit -m 'Add some AmazingFeature'`).
+4.  Fai Push sul tuo branch (`git push origin feature/AmazingFeature`). / Push to your branch (`git push origin feature/AmazingFeature`).
+5.  Apri una Pull Request. / Open a Pull Request.
+
+🇮🇹 Per favore, assicurati che il tuo codice segua le linee guida di stile del progetto e includa test appropriati se necessario.
+🇬🇧 Please ensure your code follows the project's styling guidelines and includes appropriate tests if necessary.
+
+## 📜 Licenza / License
+
+Questo progetto è rilasciato sotto la Licenza [NOME_LICENZA_QUI](#). Vedi il file `LICENSE` per maggiori dettagli.
+This project is released under the [LICENSE_NAME_HERE](#) License. See the `LICENSE` file for more details.
+(Link e nome da aggiornare)
+
+---
+
+<div align="center">
+  <p>Made with ❤️ and TypeScript</p>
+</div>
