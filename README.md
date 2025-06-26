@@ -5,7 +5,7 @@
 # ComfyUI Workflow Inspector
 
 [![Contributors][contributors-shield]][contributors-url]
-[![Release Version Badge](https://img.shields.io/github.com/d4N-87/ComfyUI-Workflow-Inspector?style=for-the-badge)](https://github.com/d4N-87/ComfyUI-d4N87-Workflow/releases)
+[![Release Version Badge](https://img.shields.io/github.com/d4N-87/ComfyUI-Workflow-Inspector?style=for-the-badge)](https://github.com/d4N-87/ComfyUI-Workflow-Inspector/releases)
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
