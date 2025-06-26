@@ -17,6 +17,7 @@ export default defineConfig({
       // Questo aiuta le librerie a trovare il polyfill giusto
       'buffer': 'buffer/',
     }
-  }
+  },
+  // GITHUB PAGES:
+  base: '/ComfyUI-Workflow-Inspector/' 
 })
-

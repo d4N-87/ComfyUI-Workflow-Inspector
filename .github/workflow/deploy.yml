@@ -1,0 +1,55 @@
+# .github/workflows/deploy.yml
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ "main" ] # IT: Attiva su push al branch principale. EN: Trigger on push to the main branch.
+  workflow_dispatch: # IT: Permette l'avvio manuale. EN: Allows manual triggering.
+
+permissions: # IT: Permessi necessari per il token GITHUB_TOKEN. EN: Permissions needed for GITHUB_TOKEN.
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency: # IT: Assicura un solo deploy alla volta. EN: Ensures only one deployment at a time.
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18 # IT: Specifica la versione di Node.js. EN: Specify Node.js version.
+          cache: 'npm'     # IT: Abilita cache per npm. EN: Enable npm cache.
+
+      - name: Install dependencies
+        run: npm install # IT: Sostituire con yarn/pnpm se necessario. EN: Replace with yarn/pnpm if needed.
+
+      - name: Build application
+        run: npm run build # IT: Sostituire con yarn/pnpm se necessario. EN: Replace with yarn/pnpm if needed.
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4 # IT: Prepara l'ambiente per il deploy su GitHub Pages. EN: Prepares environment for GitHub Pages deployment.
+
+      - name: Upload build artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist' # IT: Carica la cartella 'dist' come artefatto per Pages. EN: Upload 'dist' folder as Pages artifact.
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }} # IT: URL del sito deployato, fornito dall'action. EN: Deployed site URL, provided by the action.
+    runs-on: ubuntu-latest
+    needs: build # IT: Il deploy dipende dal successo del job di build. EN: Deployment depends on successful build job.
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4 # IT: Action ufficiale per il deploy su GitHub Pages. EN: Official action for deploying to GitHub Pages.
