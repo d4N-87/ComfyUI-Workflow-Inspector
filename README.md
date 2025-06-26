@@ -42,12 +42,10 @@
 
 ## 🖼️ Anteprima / Preview
 
-<!-- Qui potremmo inserire uno screenshot o una GIF dell'applicazione -->
-<!-- We can insert a screenshot or GIF of the application here -->
-<!-- Esempio: <img src="docs/screenshot.png" alt="App Screenshot" width="700"/> -->
 <div align="center">
-  <!-- Placeholder for screenshot -->
-  <p><em>(Screenshot dell'applicazione in arrivo / Application screenshot coming soon)</em></p>
+  <img src="docs/images/app-screenshot-01.png" alt="ComfyUI Workflow Inspector Home" width="700"/>
+  <img src="docs/images/app-screenshot-02.png" alt="ComfyUI Workflow Inspector High Interface" width="700"/>
+  <img src="docs/images/app-screenshot-03.png" alt="ComfyUI Workflow Inspector Low Interface" width="700"/>
 </div>
 
 
