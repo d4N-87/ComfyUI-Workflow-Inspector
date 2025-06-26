@@ -24,10 +24,8 @@
     🇬🇧 **Smart Upload**: Supports workflows from PNG, WebP, MP4, FLAC, and JSON files.
 *   🇮🇹 **Visualizzazione Nodi**: Elenco chiaro dei nodi rilevati nel workflow.
     🇬🇧 **Node Display**: Clear list of detected nodes in the workflow.
-*   🇮🇹 **Rendering Grafo Interattivo**: Grafo del workflow renderizzato con [LiteGraph.js](https://github.com/jagenjo/litegraph.js), con colori dei link e nomi dei nodi corretti ispirati a ComfyUI.
-    🇬🇧 **Interactive Graph Rendering**: Workflow graph rendered using [LiteGraph.js](https://github.com/jagenjo/litegraph.js), with correct ComfyUI-inspired link colors and node names.
-*   🇮🇹 **Gestione Nodi Speciali**: Supporto per Note, MarkdownNote, PrimitiveNode e Reroute.
-    🇬🇧 **Special Node Handling**: Support for Notes, MarkdownNotes, PrimitiveNodes, and Reroutes.
+*   🇮🇹 **Rendering Grafo Interattivo**: Grafo del workflow renderizzato con [LiteGraph.js](https://github.com/jagenjo/litegraph.js), con colori dei link e nomi dei nodi il più possibile fedeli a ComfyUI (basati su `object_info.json`).
+    🇬🇧 **Interactive Graph Rendering**: Workflow graph rendered using [LiteGraph.js](https://github.com/jagenjo/litegraph.js), with link colors and node names as faithful as possible to ComfyUI (based on `object_info.json`).
 *   🇮🇹 **Visualizzazione Note**: Le note del workflow (normali e Markdown) sono mostrate in una sezione dedicata.
     🇬🇧 **Notes Display**: Workflow notes (both regular and Markdown) are shown in a dedicated section.
 *   🇮🇹 **Interfaccia Multilingua**: Disponibile in Italiano, Inglese, Francese, Tedesco e Spagnolo (IT, EN, FR, DE, ES) con selettore.
@@ -36,6 +34,10 @@
     🇬🇧 **ComfyUI Look & Feel**: Polished user interface inspired by ComfyUI.
 *   🇮🇹 **Evidenziazione Interattiva**: Passando il mouse sulla lista dei nodi o sulle note si evidenzia il nodo corrispondente nel grafo.
     🇬🇧 **Interactive Highlighting**: Hovering over the node list or notes highlights the corresponding node in the graph.
+
+**Nota sulla Visualizzazione del Grafo:**
+🇮🇹 La visualizzazione del grafo è una rappresentazione basata sui dati estratti. Nodi personalizzati non presenti nel file `object_info.json` standard di ComfyUI o nodi con logiche di rendering complesse potrebbero non essere visualizzati esattamente come in ComfyUI (es. potrebbero apparire come nodi generici o con indicatori di errore se il tipo non è riconosciuto da LiteGraph.js in base alle definizioni fornite). Lo scopo principale è fornire una panoramica della struttura e delle connessioni del workflow.
+🇬🇧 **Note on Graph Visualization:** The graph visualization is a representation based on the extracted data. Custom nodes not present in ComfyUI's standard `object_info.json` file or nodes with complex rendering logic may not be displayed exactly as in ComfyUI (e.g., they might appear as generic nodes or with error indicators if the type is not recognized by LiteGraph.js based on the provided definitions). The main purpose is to provide an overview of the workflow's structure and connections.
 
 ## 🖼️ Anteprima / Preview
 
@@ -61,31 +63,44 @@
 
 ## 🛠️ Come Eseguire Localmente / How to Run Locally
 
+**Prerequisiti / Prerequisites:**
+*   🇮🇹 È necessario avere [Node.js](https://nodejs.org/) (versione 18.x o successiva consigliata) installato sul proprio sistema. Questo include npm (Node Package Manager).
+    🇬🇧 You need to have [Node.js](https://nodejs.org/) (version 18.x or later recommended) installed on your system. This includes npm (Node Package Manager).
+
 1.  **Clona il repository / Clone the repository:**
     ```bash
     git clone https://github.com/d4N-87/ComfyUI-Workflow-Inspector.git
     cd ComfyUI-Workflow-Inspector
     ```
 
-2.  **Installa le dipendenze / Install dependencies:**
+2.  **Installa le dipendenze / Install dependencies** (scegli il tuo package manager preferito):
+    (choose your preferred package manager):
     ```bash
     npm install
+    ```
+    ```bash
     # o / or
-    # yarn install
+    yarn install
+    ```
+    ```bash
     # o / or
-    # pnpm install
+    pnpm install
     ```
 
 3.  **Avvia il server di sviluppo / Start the development server:**
     ```bash
     npm run dev
-    # o / or
-    # yarn dev
-    # o / or
-    # pnpm dev
     ```
-    L'applicazione sarà disponibile su `http://localhost:5173` (o un'altra porta se 5173 è occupata).
-    The application will be available at `http://localhost:5173` (or another port if 5173 is busy).
+    ```bash
+    # o / or
+    yarn dev
+    ```
+    ```bash
+    # o / or
+    pnpm dev
+    ```
+    🇮🇹 L'applicazione sarà disponibile su `http://localhost:5173` (o un'altra porta se 5173 è occupata).
+    🇬🇧 The application will be available at `http://localhost:5173` (or another port if 5173 is busy).
 
 ## 📖 Come Usare / How to Use
 
