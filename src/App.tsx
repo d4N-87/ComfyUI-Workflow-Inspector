@@ -26,12 +26,12 @@ function App() {
 
   // IT: Stati del componente.
   // EN: Component states.
-  const [fileName, setFileName] = useState<string | null>(null); // IT: Nome del file caricato. EN: Name of the loaded file.
-  const [errorMessage, setErrorMessage] = useState<string | null>(null); // IT: Messaggio di errore. EN: Error message.
-  const [workflow, setWorkflow] = useState<NormalizedWorkflow | null>(null); // IT: Dati del workflow. EN: Workflow data.
-  const [objectInfo, setObjectInfo] = useState<Record<string, ComfyNodeInfo> | null>(null); // IT: Info sui tipi di nodo. EN: Node type info.
-  const [isAppReady, setIsAppReady] = useState(false); // IT: Flag di prontezza dell'app. EN: App readiness flag.
-  const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null); // IT: ID nodo evidenziato. EN: Highlighted node ID.
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [workflow, setWorkflow] = useState<NormalizedWorkflow | null>(null);
+  const [objectInfo, setObjectInfo] = useState<Record<string, ComfyNodeInfo> | null>(null);
+  const [isAppReady, setIsAppReady] = useState(false);
+  const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
 
   const repositoryUrl = "https://github.com/d4N-87/ComfyUI-Workflow-Inspector"; 
 
@@ -40,22 +40,27 @@ function App() {
   useEffect(() => {
     async function initializeApp() {
       try {
-        const response = await fetch('/object_info.json');
+        // IT: Costruisce il percorso per object_info.json tenendo conto del BASE_URL di Vite.
+        // Necessario per il corretto funzionamento sia in locale che su GitHub Pages (sottocartella).
+        // EN: Constructs the path for object_info.json considering Vite's BASE_URL.
+        // Necessary for correct operation both locally and on GitHub Pages (subfolder).
+        const objectInfoPath = `${import.meta.env.BASE_URL}object_info.json`.replace(/\/\//g, '/');
+        const response = await fetch(objectInfoPath);
+        
         if (!response.ok) {
-          throw new Error(`Errore HTTP: ${response.status}`);
+          throw new Error(`HTTP error ${response.status} while fetching object_info.json`);
         }
         const fetchedObjectInfo = await response.json();
         registerComfyNodes(fetchedObjectInfo);
         setObjectInfo(fetchedObjectInfo);
         setIsAppReady(true);
-      } catch (error)
-      {
+      } catch (error) {
         console.error(t('errorInit'), error);
         setErrorMessage(t('errorInit'));
       }
     }
     initializeApp();
-  }, [t]); 
+  }, [t]); // IT: La dipendenza da 't' è per ri-tradurre i messaggi di errore se la lingua cambia. EN: Dependency on 't' is to re-translate error messages if language changes.
 
   // IT: Gestisce il cambio del file di input.
   // EN: Handles input file change.
@@ -65,7 +70,7 @@ function App() {
     setWorkflow(null);
 
     const file = event.target.files?.[0];
-    if (!file || !objectInfo) return;
+    if (!file || !objectInfo) return; // IT: Esce se non c'è file o objectInfo non è pronto. EN: Exit if no file or objectInfo not ready.
     setFileName(file.name);
 
     try {
@@ -98,12 +103,14 @@ function App() {
   ];
 
   return (
+    // IT: Contenitore principale dell'applicazione.
+    // EN: Main application container.
     <div className="bg-gray-900 text-white min-h-screen flex flex-col font-sans antialiased">
       {/* IT: Selettore lingua. EN: Language selector. */}
       <div className="absolute top-4 right-4 z-10 px-4 md:px-8">
         <select 
           onChange={changeLanguage} 
-          value={i18n.language.split('-')[0]} 
+          value={i18n.language.split('-')[0]} // IT: Usa la parte base della lingua. EN: Uses the base part of the language.
           className="bg-gray-700 text-white p-2 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-500"
         >
           {languageOptions.map(option => (
@@ -115,11 +122,11 @@ function App() {
       {/* IT: Header dell'applicazione. EN: Application header. */}
       <header className="w-full bg-gray-800/70 border-b border-gray-700 shadow-lg backdrop-blur-sm">
         <div className="container mx-auto px-4 md:px-8 py-4 md:py-6 flex flex-col md:flex-row items-center md:items-end">
-          {/* IT: Logo. EN: Logo. */}
+          {/* IT: Logo con link al repository. EN: Logo with link to repository. */}
           <div className="flex-none mb-4 md:mb-0 md:mr-6">
-            <a href={repositoryUrl} target="_blank" rel="noopener noreferrer" title="Vai al Repository GitHub">
+            <a href={repositoryUrl} target="_blank" rel="noopener noreferrer" title={t('githubRepoLinkTooltip') || "Vai al Repository GitHub"}>
               <img 
-                src="/workflow_inspector_logo.webp" 
+                src={`${import.meta.env.BASE_URL}workflow_inspector_logo.webp`.replace(/\/\//g, '/')} // IT: Percorso logo corretto. EN: Correct logo path.
                 alt="ComfyUI Workflow Inspector Logo" 
                 className="h-24 md:h-26 lg:h-32 w-auto transition-opacity duration-300 hover:opacity-80 
                            filter drop-shadow-[0_2px_2px_rgba(255,255,255,0.2)]"
@@ -170,7 +177,6 @@ function App() {
                       className="font-mono text-sm bg-gray-700/60 p-2 rounded-md 
                                  transition-all duration-200 ease-in-out 
                                  hover:bg-gray-600/80 hover:shadow-lg hover:shadow-yellow-500/10"
-                      // IT: Evidenzia nodo nel grafo al passaggio del mouse. EN: Highlight node in graph on mouse enter.
                       onMouseEnter={() => setHighlightedNodeId(node.id)}
                       onMouseLeave={() => setHighlightedNodeId(null)}
                     >
@@ -184,13 +190,11 @@ function App() {
 
           {/* IT: Area visualizzatore grafo e messaggi di errore. EN: Graph viewer area and error messages. */}
           <div className="flex-grow h-full relative">
-            {/* IT: Messaggio di errore. EN: Error message. */}
             {errorMessage && (
                <div className="absolute inset-0 bg-red-900/50 text-red-300 flex items-center justify-center p-4 rounded-xl border border-red-700">
                   <p className="text-center">{errorMessage}</p> 
                </div>
             )}
-            {/* IT: Visualizzatore LiteGraph. EN: LiteGraph viewer. */}
             <div className="w-full h-full rounded-xl overflow-hidden border border-gray-700">
               <LiteGraphViewer graphData={workflow} highlightedNodeId={highlightedNodeId} />
             </div>
@@ -206,13 +210,11 @@ function App() {
                 <div 
                   key={note.id} 
                   className="bg-gray-800 border border-gray-700 rounded-xl p-4 transition-all duration-200 hover:border-yellow-400 hover:scale-105"
-                  // IT: Evidenzia nota nel grafo al passaggio del mouse. EN: Highlight note in graph on mouse enter.
                   onMouseEnter={() => setHighlightedNodeId(note.id)}
                   onMouseLeave={() => setHighlightedNodeId(null)}
                 >
                   <h3 className="font-mono text-sm text-yellow-500 mb-2">{t('noteLabel', { id: note.id })}</h3>
                   <div className="text-gray-300 font-sans text-base break-words">
-                    {/* IT: Renderizza Markdown o testo semplice. EN: Renders Markdown or plain text. */}
                     {note.type === 'MarkdownNote' ? (
                       <div className="markdown-content">
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>{note.text}</ReactMarkdown>
