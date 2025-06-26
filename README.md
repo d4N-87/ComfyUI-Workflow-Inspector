@@ -6,7 +6,9 @@
 
 <div align="center">
   <img src="https://img.shields.io/github/license/d4N-87/ComfyUI-Workflow-Inspector?style=flat-square" alt="License Badge"/>
+  <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/d4N-87/ComfyUI-Workflow-Inspector?style=flat-square">
 </div>
+
 
 **Ispeziona e visualizza i metadati dei workflow ComfyUI incorporati in file PNG, WebP, MP4, FLAC e JSON con un'interfaccia intuitiva e multilingua.**
 
