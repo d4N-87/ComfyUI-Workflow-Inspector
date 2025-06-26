@@ -4,13 +4,8 @@
 
 # ComfyUI Workflow Inspector
 
-<div align="center">
-  <img src="https://img.shields.io/github/license/d4N-87/ComfyUI-Workflow-Inspector?style=flat-square" alt="License Badge"/>
-  <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/d4N-87/ComfyUI-Workflow-Inspector?style=flat-square">
-</div>
-
 [![Contributors][contributors-shield]][contributors-url]
-[![Release Version Badge](https://img.shields.io/github/v/release/d4N-87/ComfyUI-d4N87-Workflow?style=for-the-badge)](https://github.com/d4N-87/ComfyUI-d4N87-Workflow/releases)
+[![Release Version Badge](https://img.shields.io/github.com/d4N-87/ComfyUI-Workflow-Inspector?style=for-the-badge)](https://github.com/d4N-87/ComfyUI-d4N87-Workflow/releases)
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
