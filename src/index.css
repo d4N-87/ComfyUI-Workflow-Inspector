@@ -1,0 +1,34 @@
+/* src/index.css */
+
+/* IT: Direttive base di Tailwind CSS. */
+/* EN: Tailwind CSS base directives. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* IT: Layer per componenti personalizzati. */
+/* EN: Layer for custom components. */
+@layer components {
+  /* IT: Stili per contenuto Markdown nelle note. */
+  /* EN: Styles for Markdown content in notes. */
+  .markdown-content h2 {
+    /* IT: Stile per titoli h2 Markdown. */
+    /* EN: Style for Markdown h2 titles. */
+    @apply text-lg font-bold border-b border-gray-600 pb-1 mb-2;
+  }
+  .markdown-content ul {
+    /* IT: Stile per liste ul Markdown. */
+    /* EN: Style for Markdown ul lists. */
+    @apply list-disc pl-5 space-y-1;
+  }
+  .markdown-content a {
+    /* IT: Stile per link Markdown. */
+    /* EN: Style for Markdown links. */
+    @apply text-cyan-400 hover:underline;
+  }
+  .markdown-content strong {
+    /* IT: Stile per testo grassetto Markdown. */
+    /* EN: Style for Markdown bold text. */
+    @apply font-bold text-gray-100;
+  }
+}

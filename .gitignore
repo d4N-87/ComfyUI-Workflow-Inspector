@@ -1,0 +1,94 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Dependency directories
+node_modules/
+.pnp # Yarn PnP
+.pnp.js
+.pnp.cjs
+
+# Build output
+dist/
+dist-ssr/ # Server-side rendering output
+
+# More build output (common frameworks)
+.output/
+.next/
+.nuxt/
+.svelte-kit/
+.vercel/
+.netlify/
+
+# TypeScript cache files
+*.tsbuildinfo
+
+# ESLint cache
+.eslintcache
+
+# Vite / Vitest cache
+.vite/ # Vite internal cache (though often in node_modules/.vite)
+.vitest-cache/ # Vitest cache
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Local environment variables and secrets
+# Exclude all .env files except .env.example or .env.template
+.env
+.env.local
+.env.*.local
+!.env.example
+!.env.template
+
+# IDE / Editor specific files & directories
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json # Often useful to share debug configurations
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Visual Studio files (if anyone in the team uses it for other parts)
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Test & Coverage reports
+coverage/
+.nyc_output/
+junit.xml
+cypress/videos/
+cypress/screenshots/
+
+# Temporary files & directories
+temp/
+tmp/
+*.tmp
+*.temp
+*.swp # Vim swap files
+*~ # Backup files
+
+# Optional: If using `gh-pages` for deployment, its cache
+# .gh-pages/
+
+# Optional: WebStorm specific
+# .idea/shelf/ # Shelved changes
+# .idea/sonarlint/ # SonarLint specific data

@@ -1,0 +1,17 @@
+{
+  "appTitle": "ComfyUI-Workflow-Inspector",
+  "appSubtitle": "Inspect workflows from PNG, WebP, MP4, FLAC, and JSON files.",
+  "uploadButton": "Select a file...",
+  "uploadButtonReady": "Initialization...",
+  "uploadButtonLoaded": "Loaded: {{fileName}}",
+  "detectedNodesTitle": "Detected Nodes ({{count}})",
+  "workflowNotesTitle": "Workflow Notes",
+  "noteLabel": "Note (Node ID: {{id}})",
+  "errorLoadingFile": "Error loading file: {{error}}",
+  "errorNoWorkflow": "No ComfyUI workflow found in the file or unsupported format.",
+  "errorUnexpected": "An unexpected error occurred while parsing the file.",
+  "errorInit": "Could not initialize the application. Check the console.",
+  "errorNodeDefs": "Node definitions not yet loaded. Please try again in a second.",
+  "footerNote": "Note: The workflow display is a schematic representation for inspecting the flow and position of nodes. It is not an interactive interface. For full visualization, open the file in ComfyUI.",
+  "footerRepoLink": "ComfyUI-Workflow-Inspector on GitHub"
+}

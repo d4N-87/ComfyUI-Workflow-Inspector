@@ -1,0 +1,17 @@
+{
+  "appTitle": "ComfyUI-Workflow-Inspector",
+  "appSubtitle": "Überprüfen Sie Workflows aus PNG-, WebP-, MP4-, FLAC- und JSON-Dateien.",
+  "uploadButton": "Datei auswählen...",
+  "uploadButtonReady": "Initialisierung...",
+  "uploadButtonLoaded": "Geladen: {{fileName}}",
+  "detectedNodesTitle": "Erkannte Knoten ({{count}})",
+  "workflowNotesTitle": "Workflow-Notizen",
+  "noteLabel": "Notiz (Knoten-ID: {{id}})",
+  "errorLoadingFile": "Fehler beim Laden der Datei: {{error}}",
+  "errorNoWorkflow": "Kein ComfyUI-Workflow in der Datei gefunden oder Format nicht unterstützt.",
+  "errorUnexpected": "Beim Parsen der Datei ist ein unerwarteter Fehler aufgetreten.",
+  "errorInit": "Anwendung konnte nicht initialisiert werden. Überprüfen Sie die Konsole.",
+  "errorNodeDefs": "Knotendefinitionen noch nicht geladen. Bitte versuchen Sie es in einer Sekunde erneut.",
+  "footerNote": "Hinweis: Die Workflow-Anzeige ist eine schematische Darstellung zur Überprüfung des Flusses und der Position der Knoten. Es handelt sich nicht um eine interaktive Oberfläche. Für eine vollständige Visualisierung öffnen Sie die Datei in ComfyUI.",
+  "footerRepoLink": "ComfyUI-Workflow-Inspector auf GitHub"
+}
