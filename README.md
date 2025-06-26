@@ -135,6 +135,13 @@ Questo progetto è rilasciato sotto la Licenza [NOME_LICENZA_QUI](#). Vedi il fi
 This project is released under the [LICENSE_NAME_HERE](#) License. See the `LICENSE` file for more details.
 (Link e nome da aggiornare)
 
+## Supporta lo sviluppatore
+
+🇮🇹 Se i workflow e le guide ti sono stati utili, puoi supportare il canale tramite PayPal con una donazione.
+🇬🇧 If the workflows and guides have been helpful to you, you can support the channel through PayPal with a donation.
+
+[![Donate with PayPal](https://raw.githubusercontent.com/stefan-niedermann/paypal-donate-button/master/paypal-donate-button.png)](https://paypal.me/d4n87?country.x=IT&locale.x=it_IT)
+
 ---
 
 <div align="center">
