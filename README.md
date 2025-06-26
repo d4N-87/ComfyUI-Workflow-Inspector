@@ -19,7 +19,7 @@ https://img.shields.io/github/v/
 ---
 
 <!-- Link to Live Demo will go here -->
-**[➡️ Prova la Demo Live! / Try the Live Demo!](#)** (Link da aggiornare)
+**[➡️ Prova la Demo Live! / Try the Live Demo!](https://d4n-87.github.io/ComfyUI-Workflow-Inspector/)**
 
 ---
 
