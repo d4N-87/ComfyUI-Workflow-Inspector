@@ -168,11 +168,11 @@ This project is released under the **MIT** License. See the [`LICENSE`](LICENSE)
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
-[contributors-shield]: https://img.shields.io/github/contributors/d4N-87/ComfyUI-d4N87-Workflow.svg?style=for-the-badge
-[contributors-url]: https://github.com/d4N-87/ComfyUI-d4N87-Workflow/graphs/contributors
-[stars-shield]: https://img.shields.io/github/stars/d4N-87/ComfyUI-d4N87-Workflow.svg?style=for-the-badge
-[stars-url]: https://github.com/d4N-87/ComfyUI-d4N87-Workflow/stargazers
-[issues-shield]: https://img.shields.io/github/issues/d4N-87/ComfyUI-d4N87-Workflow.svg?style=for-the-badge
-[issues-url]: https://github.com/d4N-87/ComfyUI-d4N87-Workflow/issues
+[contributors-shield]: https://img.shields.io/github/contributors/d4N-87/ComfyUI-Workflow-Inspector.svg?style=for-the-badge
+[contributors-url]: https://github.com/d4N-87/ComfyUI-Workflow-Inspector/graphs/contributors
+[stars-shield]: https://img.shields.io/github/stars/d4N-87/ComfyUI-Workflow-Inspector.svg?style=for-the-badge
+[stars-url]: https://github.com/d4N-87/ComfyUI-Workflow-Inspector/stargazers
+[issues-shield]: https://img.shields.io/github/issues/d4N-87/ComfyUI-Workflow-Inspector.svg?style=for-the-badge
+[issues-url]: https://github.com/d4N-87/ComfyUI-Workflow-Inspector/issues
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/danielenofi
