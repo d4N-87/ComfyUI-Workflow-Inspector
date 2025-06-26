@@ -13,5 +13,6 @@
   "errorInit": "Anwendung konnte nicht initialisiert werden. Überprüfen Sie die Konsole.",
   "errorNodeDefs": "Knotendefinitionen noch nicht geladen. Bitte versuchen Sie es in einer Sekunde erneut.",
   "footerNote": "Hinweis: Die Workflow-Anzeige ist eine schematische Darstellung zur Überprüfung des Flusses und der Position der Knoten. Es handelt sich nicht um eine interaktive Oberfläche. Für eine vollständige Visualisierung öffnen Sie die Datei in ComfyUI.",
-  "footerRepoLink": "ComfyUI-Workflow-Inspector auf GitHub"
+  "footerRepoLink": "ComfyUI-Workflow-Inspector auf GitHub",
+  "footerPrivacyNote": "Ihre Dateien werden lokal in diesem Browser verarbeitet. Es werden niemals Daten auf einen Server hochgeladen."
 }

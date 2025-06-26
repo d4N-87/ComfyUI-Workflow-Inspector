@@ -233,6 +233,9 @@ function App() {
         <p className="text-gray-500 text-sm">
           {t('footerNote')}
         </p>
+        <p className="text-gray-600 text-xs mt-1">
+          {t('footerPrivacyNote')}
+        </p>
         <p className="text-gray-600 text-xs mt-2">
           <a href={repositoryUrl} target="_blank" rel="noopener noreferrer" className="text-yellow-500 hover:underline">{t('footerRepoLink')}</a>
         </p>

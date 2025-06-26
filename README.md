@@ -117,6 +117,24 @@
 5.  🇮🇹 Puoi cambiare la lingua dell'interfaccia usando il selettore in alto a destra.
     🇬🇧 You can change the interface language using the selector in the top-right corner.
 
+## 🔒 Privacy e Sicurezza dei Dati / Privacy and Data Security
+
+🇮🇹 **La tua privacy è importante.**
+ComfyUI Workflow Inspector è progettato per funzionare interamente nel tuo browser web, sia che tu esegua l'applicazione localmente o utilizzi la versione online ospitata su GitHub Pages.
+
+**Funzionamento Client-Side:**
+Quando carichi un file, questo viene letto ed elaborato direttamente dal codice JavaScript in esecuzione nel tuo browser.
+**Nessun file o dato del workflow viene mai inviato, caricato o salvato su alcun server esterno.**
+Tutta l'analisi e la visualizzazione avvengono localmente sulla tua macchina.
+
+🇬🇧 **Your privacy is important.**
+ComfyUI Workflow Inspector is designed to operate entirely within your web browser, whether you run the application locally or use the online version hosted on GitHub Pages.
+
+**Client-Side Operation:**
+When you upload a file, it is read and processed directly by the JavaScript code running in your browser.
+**No files or workflow data are ever sent, uploaded, or stored on any external server.**
+All analysis and visualization occur locally on your machine.
+
 ## 🤝 Come Contribuire / How to Contribute
 
 🇮🇹 I contributi sono benvenuti! Se vuoi contribuire, per favore:

@@ -13,5 +13,6 @@
   "errorInit": "No se pudo inicializar la aplicación. Compruebe la consola.",
   "errorNodeDefs": "Definiciones de nodos aún no cargadas. Inténtelo de nuevo en un segundo.",
   "footerNote": "Nota: La visualización del flujo de trabajo es una representación esquemática para inspeccionar el flujo y la posición de los nodos. No es una interfaz interactiva. Para una visualización completa, abra el archivo en ComfyUI.",
-  "footerRepoLink": "ComfyUI-Workflow-Inspector en GitHub"
+  "footerRepoLink": "ComfyUI-Workflow-Inspector en GitHub",
+  "footerPrivacyNote": "Tus archivos se procesan localmente en este navegador. Nunca se suben datos a ningún servidor."
 }

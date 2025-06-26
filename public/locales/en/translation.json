@@ -13,5 +13,6 @@
   "errorInit": "Could not initialize the application. Check the console.",
   "errorNodeDefs": "Node definitions not yet loaded. Please try again in a second.",
   "footerNote": "Note: The workflow display is a schematic representation for inspecting the flow and position of nodes. It is not an interactive interface. For full visualization, open the file in ComfyUI.",
-  "footerRepoLink": "ComfyUI-Workflow-Inspector on GitHub"
+  "footerRepoLink": "ComfyUI-Workflow-Inspector on GitHub",
+  "footerPrivacyNote": "Your files are processed locally in this browser. No data is ever uploaded to any server."
 }
