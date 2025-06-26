@@ -131,9 +131,8 @@
 
 ## 📜 Licenza / License
 
-Questo progetto è rilasciato sotto la Licenza [NOME_LICENZA_QUI](#). Vedi il file `LICENSE` per maggiori dettagli.
-This project is released under the [LICENSE_NAME_HERE](#) License. See the `LICENSE` file for more details.
-(Link e nome da aggiornare)
+Questo progetto è rilasciato sotto la Licenza **MIT**. Vedi il file [`LICENSE`](LICENSE) per maggiori dettagli.
+This project is released under the **MIT** License. See the [`LICENSE`](LICENSE) file for more details.
 
 ## Supporta lo sviluppatore
 
@@ -141,6 +140,10 @@ This project is released under the [LICENSE_NAME_HERE](#) License. See the `LICE
 🇬🇧 If the workflows and guides have been helpful to you, you can support the channel through PayPal with a donation.
 
 [![Donate with PayPal](https://raw.githubusercontent.com/stefan-niedermann/paypal-donate-button/master/paypal-donate-button.png)](https://paypal.me/d4n87?country.x=IT&locale.x=it_IT)
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=d4N-87/ComfyUI-Workflow-Inspector&type=Date)](https://www.star-history.com/#d4N-87/ComfyUI-Workflow-Inspector&Date)
 
 ---
 
