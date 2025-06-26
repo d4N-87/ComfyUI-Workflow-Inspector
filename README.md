@@ -9,6 +9,12 @@
   <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/d4N-87/ComfyUI-Workflow-Inspector?style=flat-square">
 </div>
 
+[![Contributors][contributors-shield]][contributors-url]
+[![Release Version Badge](https://img.shields.io/github/v/release/d4N-87/ComfyUI-d4N87-Workflow?style=for-the-badge)](https://github.com/d4N-87/ComfyUI-d4N87-Workflow/releases)
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![LinkedIn][linkedin-shield]][linkedin-url]
+
 
 **Ispeziona e visualizza i metadati dei workflow ComfyUI incorporati in file PNG, WebP, MP4, FLAC e JSON con un'interfaccia intuitiva e multilingua.**
 
@@ -145,3 +151,14 @@ This project is released under the **MIT** License. See the [`LICENSE`](LICENSE)
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=d4N-87/ComfyUI-Workflow-Inspector&type=Date)](https://www.star-history.com/#d4N-87/ComfyUI-Workflow-Inspector&Date)
+
+
+<!-- MARKDOWN LINKS & IMAGES -->
+[contributors-shield]: https://img.shields.io/github/contributors/d4N-87/ComfyUI-d4N87-Workflow.svg?style=for-the-badge
+[contributors-url]: https://github.com/d4N-87/ComfyUI-d4N87-Workflow/graphs/contributors
+[stars-shield]: https://img.shields.io/github/stars/d4N-87/ComfyUI-d4N87-Workflow.svg?style=for-the-badge
+[stars-url]: https://github.com/d4N-87/ComfyUI-d4N87-Workflow/stargazers
+[issues-shield]: https://img.shields.io/github/issues/d4N-87/ComfyUI-d4N87-Workflow.svg?style=for-the-badge
+[issues-url]: https://github.com/d4N-87/ComfyUI-d4N87-Workflow/issues
+[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
+[linkedin-url]: https://linkedin.com/in/danielenofi
