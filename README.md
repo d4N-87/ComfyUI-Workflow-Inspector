@@ -10,8 +10,6 @@
 [![Issues][issues-shield]][issues-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
-https://img.shields.io/github/v/
-
 **Ispeziona e visualizza i metadati dei workflow ComfyUI incorporati in file PNG, WebP, MP4, FLAC e JSON con un'interfaccia intuitiva e multilingua.**
 
 **Inspect and visualize ComfyUI workflow metadata embedded in PNG, WebP, MP4, FLAC, and JSON files with an intuitive, multilingual interface.**
@@ -19,7 +17,7 @@ https://img.shields.io/github/v/
 ---
 
 <!-- Link to Live Demo will go here -->
-**[➡️ Prova la Demo Live! / Try the Live Demo!](#)** (Link da aggiornare)
+**[➡️ Prova la Demo Live! / Try the Live Demo!](https://d4n-87.github.io/ComfyUI-Workflow-Inspector/)**
 
 ---
 
