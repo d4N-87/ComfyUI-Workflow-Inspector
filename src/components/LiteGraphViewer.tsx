@@ -189,7 +189,7 @@ const LiteGraphViewer: React.FC<LiteGraphViewerProps> = ({ graphData, highlighte
         Object.assign(wheelEvent, {
             clientX: event.touches[0].clientX,
             clientY: event.touches[0].clientY,
-            wheelDelta: -delta,
+            wheelDelta: -delta / 3,
         });
         canvas.dispatchEvent(wheelEvent);
 
