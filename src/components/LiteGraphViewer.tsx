@@ -144,6 +144,69 @@ const LiteGraphViewer: React.FC<LiteGraphViewerProps> = ({ graphData, highlighte
 
   }, [highlightedNodeId]);
 
+  // IT: Effetto per aggiungere il supporto al tocco per il trascinamento.
+  // EN: Effect to add touch support for dragging.
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const toMouseEvent = (touch: Touch, type: string) => {
+      return new MouseEvent(type, {
+        bubbles: true,
+        cancelable: true,
+        view: window,
+        detail: 1,
+        screenX: touch.screenX,
+        screenY: touch.screenY,
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+        ctrlKey: false,
+        altKey: false,
+        shiftKey: false,
+        metaKey: false,
+        button: 0,
+        relatedTarget: null,
+      });
+    };
+
+    const onTouchStart = (event: TouchEvent) => {
+      if (event.touches.length === 1) {
+        const touch = event.touches[0];
+        canvas.dispatchEvent(toMouseEvent(touch, 'mousedown'));
+        event.preventDefault();
+      }
+    };
+
+    const onTouchMove = (event: TouchEvent) => {
+      if (event.touches.length === 1) {
+        const touch = event.touches[0];
+        canvas.dispatchEvent(toMouseEvent(touch, 'mousemove'));
+        event.preventDefault();
+      }
+    };
+
+    const onTouchEnd = (event: TouchEvent) => {
+      if (event.changedTouches.length === 1) {
+        const touch = event.changedTouches[0];
+        canvas.dispatchEvent(toMouseEvent(touch, 'mouseup'));
+        event.preventDefault();
+      }
+    };
+
+    canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+    canvas.addEventListener('touchend', onTouchEnd, { passive: false });
+    canvas.addEventListener('touchcancel', onTouchEnd, { passive: false });
+
+    return () => {
+      canvas.removeEventListener('touchstart', onTouchStart);
+      canvas.removeEventListener('touchmove', onTouchMove);
+      canvas.removeEventListener('touchend', onTouchEnd);
+      canvas.removeEventListener('touchcancel', onTouchEnd);
+    };
+  }, []);
+
+
   return (
     <div style={{ width: '100%', height: '100%', backgroundColor: '#202020', cursor: 'grab' }}>
       <canvas ref={canvasRef} style={{ width: '100%', height: '100%' }} />
