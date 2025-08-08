@@ -144,53 +144,58 @@ const LiteGraphViewer: React.FC<LiteGraphViewerProps> = ({ graphData, highlighte
 
   }, [highlightedNodeId]);
 
-  // IT: Effetto per aggiungere il supporto al tocco per il trascinamento.
-  // EN: Effect to add touch support for dragging.
+  // IT: Effetto per aggiungere il supporto al tocco per trascinamento e zoom.
+  // EN: Effect to add touch support for dragging and zooming.
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    let lastTouchDistance = 0;
+
     const toMouseEvent = (touch: Touch, type: string) => {
       return new MouseEvent(type, {
-        bubbles: true,
-        cancelable: true,
-        view: window,
-        detail: 1,
-        screenX: touch.screenX,
-        screenY: touch.screenY,
-        clientX: touch.clientX,
-        clientY: touch.clientY,
-        ctrlKey: false,
-        altKey: false,
-        shiftKey: false,
-        metaKey: false,
-        button: 0,
-        relatedTarget: null,
+        bubbles: true, cancelable: true, view: window, detail: 1,
+        screenX: touch.screenX, screenY: touch.screenY,
+        clientX: touch.clientX, clientY: touch.clientY,
+        button: 0, buttons: 1, relatedTarget: null
       });
     };
 
     const onTouchStart = (event: TouchEvent) => {
-      if (event.touches.length === 1) {
-        const touch = event.touches[0];
-        canvas.dispatchEvent(toMouseEvent(touch, 'mousedown'));
+      if (event.touches.length === 2) {
         event.preventDefault();
+        const dx = event.touches[0].clientX - event.touches[1].clientX;
+        const dy = event.touches[0].clientY - event.touches[1].clientY;
+        lastTouchDistance = Math.sqrt(dx * dx + dy * dy);
+      } else if (event.touches.length === 1) {
+        event.preventDefault();
+        canvas.dispatchEvent(toMouseEvent(event.touches[0], 'mousedown'));
       }
     };
 
     const onTouchMove = (event: TouchEvent) => {
-      if (event.touches.length === 1) {
-        const touch = event.touches[0];
-        canvas.dispatchEvent(toMouseEvent(touch, 'mousemove'));
-        event.preventDefault();
+      event.preventDefault();
+      if (event.touches.length === 2) {
+        const dx = event.touches[0].clientX - event.touches[1].clientX;
+        const dy = event.touches[0].clientY - event.touches[1].clientY;
+        const touchDistance = Math.sqrt(dx * dx + dy * dy);
+        const delta = lastTouchDistance - touchDistance;
+
+        canvas.dispatchEvent(new WheelEvent('wheel', {
+          deltaY: delta, clientX: event.touches[0].clientX, clientY: event.touches[0].clientY
+        }));
+        lastTouchDistance = touchDistance;
+      } else if (event.touches.length === 1) {
+        canvas.dispatchEvent(toMouseEvent(event.touches[0], 'mousemove'));
       }
     };
 
     const onTouchEnd = (event: TouchEvent) => {
-      if (event.changedTouches.length === 1) {
-        const touch = event.changedTouches[0];
-        canvas.dispatchEvent(toMouseEvent(touch, 'mouseup'));
+      if (event.touches.length === 0 && event.changedTouches.length === 1) {
         event.preventDefault();
+        canvas.dispatchEvent(toMouseEvent(event.changedTouches[0], 'mouseup'));
       }
+      lastTouchDistance = 0;
     };
 
     canvas.addEventListener('touchstart', onTouchStart, { passive: false });
@@ -205,7 +210,6 @@ const LiteGraphViewer: React.FC<LiteGraphViewerProps> = ({ graphData, highlighte
       canvas.removeEventListener('touchcancel', onTouchEnd);
     };
   }, []);
-
 
   return (
     <div style={{ width: '100%', height: '100%', backgroundColor: '#202020', cursor: 'grab' }}>
