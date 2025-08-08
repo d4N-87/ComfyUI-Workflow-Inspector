@@ -157,7 +157,7 @@ const LiteGraphViewer: React.FC<LiteGraphViewerProps> = ({ graphData, highlighte
         bubbles: true, cancelable: true, view: window, detail: 1,
         screenX: touch.screenX, screenY: touch.screenY,
         clientX: touch.clientX, clientY: touch.clientY,
-        button: 0, buttons: 1, relatedTarget: null
+        button: 0, buttons: type === 'mouseup' ? 0 : 1, relatedTarget: null
       });
     };
 
@@ -182,7 +182,10 @@ const LiteGraphViewer: React.FC<LiteGraphViewerProps> = ({ graphData, highlighte
         const delta = lastTouchDistance - touchDistance;
 
         canvas.dispatchEvent(new WheelEvent('wheel', {
-          deltaY: delta, clientX: event.touches[0].clientX, clientY: event.touches[0].clientY
+          deltaY: delta, 
+          clientX: event.touches[0].clientX, 
+          clientY: event.touches[0].clientY,
+          ctrlKey: true
         }));
         lastTouchDistance = touchDistance;
       } else if (event.touches.length === 1) {
