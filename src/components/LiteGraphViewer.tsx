@@ -181,12 +181,18 @@ const LiteGraphViewer: React.FC<LiteGraphViewerProps> = ({ graphData, highlighte
         const touchDistance = Math.sqrt(dx * dx + dy * dy);
         const delta = lastTouchDistance - touchDistance;
 
-        canvas.dispatchEvent(new WheelEvent('wheel', {
-          deltaY: delta, 
-          clientX: event.touches[0].clientX, 
-          clientY: event.touches[0].clientY,
-          ctrlKey: true
-        }));
+        const wheelEvent = new CustomEvent('mousewheel', {
+          bubbles: true,
+          cancelable: true,
+          detail: -delta
+        });
+        Object.assign(wheelEvent, {
+            clientX: event.touches[0].clientX,
+            clientY: event.touches[0].clientY,
+            wheelDelta: -delta,
+        });
+        canvas.dispatchEvent(wheelEvent);
+
         lastTouchDistance = touchDistance;
       } else if (event.touches.length === 1) {
         canvas.dispatchEvent(toMouseEvent(event.touches[0], 'mousemove'));
