@@ -14,5 +14,6 @@
   "errorNodeDefs": "Definizioni dei nodi non ancora caricate. Riprova tra un secondo.",
   "footerNote": "Nota: La visualizzazione del workflow è una rappresentazione schematica per l'ispezione del flusso e della posizione dei nodi. Non è un'interfaccia interattiva. Per la visualizzazione completa aprire il file in ComfyUI.",
   "footerRepoLink": "ComfyUI-Workflow-Inspector su GitHub",
-  "footerPrivacyNote": "I tuoi file vengono elaborati localmente in questo browser. Nessun dato viene mai caricato su alcun server."
+  "footerPrivacyNote": "I tuoi file vengono elaborati localmente in questo browser. Nessun dato viene mai caricato su alcun server.",
+  "githubRepoLinkTooltip": "Vai al Repository GitHub"
 }

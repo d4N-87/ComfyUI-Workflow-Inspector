@@ -14,5 +14,6 @@
   "errorNodeDefs": "Définitions des nœuds pas encore chargées. Veuillez réessayer dans une seconde.",
   "footerNote": "Note : L'affichage du workflow est une représentation schématique pour l'inspection du flux et de la position des nœuds. Ce n'est pas une interface interactive. Pour une visualisation complète, ouvrez le fichier dans ComfyUI.",
   "footerRepoLink": "ComfyUI-Workflow-Inspector sur GitHub",
-  "footerPrivacyNote": "Vos fichiers sont traités localement dans ce navigateur. Aucune donnée n'est jamais téléversée sur un serveur."
+  "footerPrivacyNote": "Vos fichiers sont traités localement dans ce navigateur. Aucune donnée n'est jamais téléchargée sur un serveur.",
+  "githubRepoLinkTooltip": "Aller au dépôt GitHub"
 }

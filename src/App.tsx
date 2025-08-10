@@ -124,7 +124,7 @@ function App() {
         <div className="container mx-auto px-4 md:px-8 py-4 md:py-6 flex flex-col md:flex-row items-center md:items-end">
           {/* IT: Logo con link al repository. EN: Logo with link to repository. */}
           <div className="flex-none mb-4 md:mb-0 md:mr-6">
-            <a href={repositoryUrl} target="_blank" rel="noopener noreferrer" title={t('githubRepoLinkTooltip') || "Vai al Repository GitHub"}>
+            <a href={repositoryUrl} target="_blank" rel="noopener noreferrer" title={t('githubRepoLinkTooltip')}>
               <img 
                 src={`${import.meta.env.BASE_URL}workflow_inspector_logo.webp`.replace(/\/\//g, '/')} // IT: Percorso logo corretto. EN: Correct logo path.
                 alt="ComfyUI Workflow Inspector Logo" 
