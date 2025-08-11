@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { extractAndNormalizeWorkflow } from './utils/workflowExtractor';
 import { registerComfyNodes } from './utils/litegraph-setup';
 import LiteGraphViewer from './components/LiteGraphViewer';
+import WorkflowParametersDisplay from './components/WorkflowParameters';
 import type { NormalizedWorkflow } from './types/comfy';
 
 // IT: Interfaccia per informazioni sui nodi ComfyUI.
@@ -227,6 +228,11 @@ function App() {
               ))}
             </div>
           </section>
+        )}
+
+        {/* IT: Sezione parametri del workflow. EN: Workflow parameters section. */}
+        {workflow?.parameters && (
+          <WorkflowParametersDisplay parameters={workflow.parameters} />
         )}
       </div>
 

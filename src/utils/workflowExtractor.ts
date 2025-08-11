@@ -2,7 +2,7 @@
 
 import * as mm from 'music-metadata-browser';
 import ExifReader from 'exifreader';
-import type { ApiNode, ApiWorkflow, NormalizedWorkflow, LLink, LGraphGroup, LGraphNode } from '../types/comfy';
+import type { ApiNode, ApiWorkflow, NormalizedWorkflow, LLink, LGraphGroup, LGraphNode, WorkflowParameters, SamplerParameters } from '../types/comfy';
 
 // IT: Interfaccia per informazioni sui nodi ComfyUI.
 // EN: Interface for ComfyUI node information.
@@ -96,7 +96,7 @@ export async function extractAndNormalizeWorkflow(
 
     let nodes: LGraphNode[] = []; 
     let links: LLink[] = [];
-    let groups: LGraphGroup[] = workflowSource.groups || [];
+    const groups: LGraphGroup[] = workflowSource.groups || [];
 
     // IT: Normalizza nodi e link dai formati LiteGraph o API.
     // EN: Normalize nodes and links from LiteGraph or API formats.
@@ -123,14 +123,17 @@ export async function extractAndNormalizeWorkflow(
 
     if (nodes.length === 0) return null;
 
-    const nodeList: { id: string; name: string }[] = []; // IT: Lista nodi per UI. EN: Node list for UI.
-    const extractedNotes: { id: string; text: string; type: 'Note' | 'MarkdownNote' }[] = []; // IT: Note estratte. EN: Extracted notes.
+    const nodeList: { id: string; name: string }[] = [];
+    const extractedNotes: { id: string; text: string; type: 'Note' | 'MarkdownNote' }[] = [];
+    const parameters: WorkflowParameters = { samplers: [] };
 
-    // IT: Itera sui nodi per normalizzazione finale, estrazione note e nomi.
-    // EN: Iterate over nodes for final normalization, note/name extraction.
+    // IT: Ordina i nodi per garantire l'ordine di esecuzione cronologico.
+    // EN: Sort nodes to ensure chronological execution order.
+    nodes.sort((a, b) => a.order - b.order);
+
+    // IT: Itera sui nodi per normalizzazione finale, estrazione note e parametri.
+    // EN: Iterate over nodes for final normalization, note/parameter extraction.
     nodes.forEach(node => {
-      // IT: Assicura 'node.type'.
-      // EN: Ensure 'node.type'.
       if (!node.type && (node as any).class_type) {
         node.type = (node as any).class_type;
       }
@@ -138,31 +141,49 @@ export async function extractAndNormalizeWorkflow(
       const info = objectInfo[node.type];
       const correctName = info?.display_name || info?.name || node.type;
 
-      // IT: Imposta titolo nodo per leggibilità.
-      // EN: Set node title for readability.
       if (!node.title || node.title === node.type) {
         node.title = correctName;
       }
       
-      // IT: Estrae testo da nodi Note/MarkdownNote.
-      // EN: Extract text from Note/MarkdownNote nodes.
       if (node.type === 'Note' || node.type === 'MarkdownNote') {
         const noteText = node.widgets_values?.[0] || '';
         if (noteText) {
           extractedNotes.push({ 
             id: String(node.id), 
-            text: String(noteText), // IT: Assicura stringa. EN: Ensure string.
+            text: String(noteText),
             type: node.type
           });
         }
       } else {
         nodeList.push({ id: String(node.id), name: node.title || correctName });
       }
+
+      // IT: Estrae i parametri chiave del workflow.
+      // EN: Extract key workflow parameters.
+      const widgetValues = node.widgets_values;
+      if (widgetValues) {
+        if (node.type.includes('CLIPTextEncode') && node.title?.toLowerCase().includes('positive')) {
+          parameters.positivePrompt = widgetValues[0] || parameters.positivePrompt;
+        } else if (node.type.includes('CLIPTextEncode') && node.title?.toLowerCase().includes('negative')) {
+          parameters.negativePrompt = widgetValues[0] || parameters.negativePrompt;
+        } else if (node.type === 'KSampler' || node.type === 'KSamplerAdvanced') {
+          const isAdvanced = node.type === 'KSamplerAdvanced';
+          const sampler: SamplerParameters = {
+            id: String(node.id),
+            nodeTitle: node.title || node.type,
+            steps: isAdvanced ? widgetValues[3] : widgetValues[2],
+            cfg: isAdvanced ? widgetValues[4] : widgetValues[3],
+            samplerName: isAdvanced ? widgetValues[5] : widgetValues[4],
+            scheduler: isAdvanced ? widgetValues[6] : widgetValues[5],
+          };
+          parameters.samplers.push(sampler);
+        }
+      }
     });
       
-    // IT: Restituisce workflow normalizzato.
-    // EN: Return normalized workflow.
-    return { nodes, links, groups, nodeList, notes: extractedNotes };
+    // IT: Restituisce workflow normalizzato con i parametri.
+    // EN: Return normalized workflow with parameters.
+    return { nodes, links, groups, nodeList, notes: extractedNotes, parameters };
 
   } catch (error) {
     console.error(`Errore finale nel processare il workflow per ${file.name}:`, error);

@@ -24,6 +24,25 @@ export interface ApiWorkflow {
   [nodeId: string]: ApiNode;
 }
 
+// IT: Parametri di un singolo nodo Sampler.
+// EN: Parameters for a single Sampler node.
+export interface SamplerParameters {
+  id: string;
+  nodeTitle: string;
+  steps?: number;
+  cfg?: number;
+  samplerName?: string;
+  scheduler?: string;
+}
+
+// IT: Parametri del workflow estratti per la visualizzazione.
+// EN: Workflow parameters extracted for display.
+export interface WorkflowParameters {
+  positivePrompt?: string;
+  negativePrompt?: string;
+  samplers: SamplerParameters[];
+}
+
 // IT: Workflow normalizzato per l'app.
 // EN: Normalized workflow for the app.
 export interface NormalizedWorkflow {
@@ -32,6 +51,7 @@ export interface NormalizedWorkflow {
   groups?: LGraphGroup[];
   nodeList: { id: string; name: string }[]; // IT: Lista nodi per UI. EN: Node list for UI.
   notes?: { id: string; text: string; type: 'Note' | 'MarkdownNote' }[]; // IT: Note del workflow. EN: Workflow notes.
+  parameters?: WorkflowParameters; // IT: Parametri del workflow. EN: Workflow parameters.
   [key: string]: any;
 }
 
