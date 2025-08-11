@@ -31,6 +31,8 @@
     🇬🇧 **Interactive Graph Rendering**: Workflow graph rendered using [LiteGraph.js](https://github.com/jagenjo/litegraph.js), with link colors and node names as faithful as possible to ComfyUI (based on `object_info.json`).
 *   🇮🇹 **Visualizzazione Note**: Le note del workflow (normali e Markdown) sono mostrate in una sezione dedicata.
     🇬🇧 **Notes Display**: Workflow notes (both regular and Markdown) are shown in a dedicated section.
+*   🇮🇹 **Parametri di elaborazione**: I dati di elaborazione sono riportati in una sezione dedicata.
+    🇬🇧 **Processing parameters**: The processing data is reported in a dedicated section.
 *   🇮🇹 **Interfaccia Multilingua**: Disponibile in Italiano, Inglese, Francese, Tedesco e Spagnolo (IT, EN, FR, DE, ES) con selettore.
     🇬🇧 **Multilingual Interface**: Available in Italian, English, French, German, and Spanish (IT, EN, FR, DE, ES) with a selector.
 *   🇮🇹 **Look & Feel ComfyUI**: Interfaccia utente rifinita ispirata a ComfyUI.
