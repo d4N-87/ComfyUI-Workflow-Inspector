@@ -5,10 +5,10 @@ import type p5 from 'p5';
 
 const NeuralNetwork = () => {
     const containerRef = useRef<HTMLDivElement>(null);
+    const observerRef = useRef<IntersectionObserver | null>(null);
 
     useEffect(() => {
         let p5Instance: p5 | null = null;
-        const observer: IntersectionObserver | null = null;
 
         const initializeSketch = async () => {
             const p5 = (await import('p5')).default;
@@ -105,15 +105,27 @@ const NeuralNetwork = () => {
 
             if (containerRef.current) {
                 p5Instance = new p5(sketch, containerRef.current);
+
+                observerRef.current = new IntersectionObserver(
+                    (entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting) {
+                                p5Instance?.loop();
+                            } else {
+                                p5Instance?.noLoop();
+                            }
+                        });
+                    },
+                    { threshold: 0.01 }
+                );
+                observerRef.current.observe(containerRef.current);
             }
         };
 
         initializeSketch();
 
         return () => {
-            if (observer && containerRef.current) {
-                observer.unobserve(containerRef.current);
-            }
+            observerRef.current?.disconnect();
             p5Instance?.remove();
         };
     }, []);
