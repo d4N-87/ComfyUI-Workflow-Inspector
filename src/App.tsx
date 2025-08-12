@@ -10,6 +10,7 @@ import { extractAndNormalizeWorkflow } from './utils/workflowExtractor';
 import { registerComfyNodes } from './utils/litegraph-setup';
 import LiteGraphViewer from './components/LiteGraphViewer';
 import WorkflowParametersDisplay from './components/WorkflowParameters';
+import NeuralNetwork from './components/NeuralNetwork';
 import type { NormalizedWorkflow } from './types/comfy';
 
 // IT: Interfaccia per informazioni sui nodi ComfyUI.
@@ -104,150 +105,144 @@ function App() {
   ];
 
   return (
-    // IT: Contenitore principale dell'applicazione.
-    // EN: Main application container.
-    <div className="bg-gray-900 text-white min-h-screen flex flex-col font-sans antialiased">
-      {/* IT: Selettore lingua. EN: Language selector. */}
-      <div className="absolute top-4 right-4 z-10 px-4 md:px-8">
-        <select 
-          onChange={changeLanguage} 
-          value={i18n.language.split('-')[0]} // IT: Usa la parte base della lingua. EN: Uses the base part of the language.
-          className="bg-gray-700 text-white p-2 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-        >
-          {languageOptions.map(option => (
-            <option key={option.value} value={option.value}>{option.label}</option>
-          ))}
-        </select>
+    <div className="bg-background text-primary-text min-h-screen flex flex-col font-sans antialiased relative">
+      {/* Background container with the animation and a gradient overlay */}
+      <div className="fixed inset-0 z-0">
+        <NeuralNetwork />
+        <div className="absolute inset-0 z-10 [background-image:linear-gradient(to_bottom,transparent_70%,#030b17_100%)]"></div>
       </div>
 
-      {/* IT: Header dell'applicazione. EN: Application header. */}
-      <header className="w-full bg-gray-800/70 border-b border-gray-700 shadow-lg backdrop-blur-sm">
-        <div className="container mx-auto px-4 md:px-8 py-4 md:py-6 flex flex-col md:flex-row items-center md:items-end">
-          {/* IT: Logo con link al repository. EN: Logo with link to repository. */}
-          <div className="flex-none mb-4 md:mb-0 md:mr-6">
-            <a href={repositoryUrl} target="_blank" rel="noopener noreferrer" title={t('githubRepoLinkTooltip')}>
-              <img 
-                src={`${import.meta.env.BASE_URL}workflow_inspector_logo.webp`.replace(/\/\//g, '/')} // IT: Percorso logo corretto. EN: Correct logo path.
-                alt="ComfyUI Workflow Inspector Logo" 
-                className="h-24 md:h-26 lg:h-32 w-auto transition-opacity duration-300 hover:opacity-80 
-                           filter drop-shadow-[0_2px_2px_rgba(255,255,255,0.2)]"
-              />
-            </a>
-          </div>
-          
-          {/* IT: Titolo e sottotitolo. EN: Title and subtitle. */}
-          <div className="flex-grow text-center md:text-left">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-100 tracking-tight">{t('appTitle')}</h1>
-            <p className="text-gray-400 mt-1 text-md sm:text-lg">{t('appSubtitle')}</p>
-          </div>
-        </div>
-      </header>
-      
-      {/* IT: Contenuto principale. EN: Main content. */}
-      <div className="flex-grow p-4 md:p-8">
-        {/* IT: Area di caricamento file. EN: File upload area. */}
-        <div className="w-full max-w-md bg-gray-800 border border-gray-700 rounded-xl p-6 text-center shadow-lg shadow-black/20 mb-8 backdrop-blur-sm mx-auto">
-          <label htmlFor="file-upload" className={`cursor-pointer bg-gray-700 hover:bg-gray-600 text-gray-200 font-bold py-3 px-6 rounded-lg transition-all duration-200 ease-in-out inline-block ring-2 ring-gray-600 hover:ring-yellow-500 ${!isAppReady ? 'opacity-50 cursor-not-allowed' : ''}`}>
-            {isAppReady 
-              ? (fileName ? t('uploadButtonLoaded', { fileName }) : t('uploadButton')) 
-              : t('uploadButtonReady')}
-          </label>
-          <input 
-            id="file-upload" 
-            type="file" 
-            className="hidden" 
-            onChange={handleFileChange} 
-            accept="image/png,image/webp,video/mp4,audio/flac,application/json"
-            disabled={!isAppReady}
-          />
+      {/* Main content container, stacked above the background */}
+      <div className="relative z-10 flex flex-col min-h-screen">
+        {/* Language selector */}
+        <div className="absolute top-4 right-4 z-20 px-4 md:px-8">
+          <select
+            onChange={changeLanguage}
+            value={i18n.language.split('-')[0]}
+            className="bg-surface text-primary-text p-2 rounded-md border border-border focus:outline-none focus:ring-2 focus:ring-primary-accent"
+          >
+            {languageOptions.map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
         </div>
 
-        {/* IT: Layout principale: lista nodi e visualizzatore grafo. EN: Main layout: node list and graph viewer. */}
-        <main className="w-full flex-grow flex flex-col md:flex-row gap-8 h-[70vh]">
-          {/* IT: Lista dei nodi rilevati. EN: Detected nodes list. */}
-          {workflow && workflow.nodeList.length > 0 && (
-            <aside className="w-full md:w-1/3 lg:w-1/4 bg-gray-800 border border-gray-700 rounded-xl p-4 flex flex-col h-full">
-              <h3 className="text-lg font-bold mb-3 text-gray-300 flex-shrink-0">
-                {t('detectedNodesTitle', { count: workflow.nodeList.length })}
-              </h3>
-              <div className="overflow-y-auto pr-2 flex-grow">
-                <ul className="space-y-2">
-                  {workflow.nodeList.map((node) => (
-                    <li 
-                      key={`${node.id}-${node.name}`} 
-                      className="font-mono text-sm bg-gray-700/60 p-2 rounded-md 
-                                 transition-all duration-200 ease-in-out 
-                                 hover:bg-gray-600/80 hover:shadow-lg hover:shadow-yellow-500/10"
-                      onMouseEnter={() => setHighlightedNodeId(node.id)}
-                      onMouseLeave={() => setHighlightedNodeId(null)}
-                    >
-                      {node.name} 
-                    </li>
-                  ))}
-                </ul>
+        {/* Application header */}
+        <header className="w-full bg-surface/70 border-b border-border shadow-lg backdrop-blur-sm">
+          <div className="container mx-auto px-4 md:px-8 py-4 md:py-6 flex flex-col md:flex-row items-center md:items-end">
+            <div className="flex-none mb-4 md:mb-0 md:mr-6">
+              <a href={repositoryUrl} target="_blank" rel="noopener noreferrer" title={t('githubRepoLinkTooltip')}>
+                <img
+                  src={`${import.meta.env.BASE_URL}workflow_inspector_logo.webp`.replace(/\/\//g, '/')}
+                  alt="ComfyUI Workflow Inspector Logo"
+                  className="h-24 md:h-26 lg:h-32 w-auto transition-opacity duration-300 hover:opacity-80 filter drop-shadow-[0_2px_2px_rgba(255,255,255,0.2)]"
+                />
+              </a>
+            </div>
+            <div className="flex-grow text-center md:text-left">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display text-primary-text tracking-tight">{t('appTitle')}</h1>
+              <p className="text-secondary-text mt-1 text-md sm:text-lg">{t('appSubtitle')}</p>
+            </div>
+          </div>
+        </header>
+
+        {/* Main content */}
+        <div className="flex-grow p-4 md:p-8">
+          <div className="w-full max-w-md bg-surface border border-border rounded-xl p-6 text-center shadow-lg shadow-black/20 mb-8 backdrop-blur-sm mx-auto">
+            <label htmlFor="file-upload" className={`cursor-pointer bg-surface hover:bg-primary-accent/20 text-primary-text font-bold py-3 px-6 rounded-lg transition-all duration-200 ease-in-out inline-block ring-2 ring-border hover:ring-primary-accent ${!isAppReady ? 'opacity-50 cursor-not-allowed' : ''}`}>
+              {isAppReady
+                ? (fileName ? t('uploadButtonLoaded', { fileName }) : t('uploadButton'))
+                : t('uploadButtonReady')}
+            </label>
+            <input
+              id="file-upload"
+              type="file"
+              className="hidden"
+              onChange={handleFileChange}
+              accept="image/png,image/webp,video/mp4,audio/flac,application/json"
+              disabled={!isAppReady}
+            />
+          </div>
+
+          <main className="w-full flex-grow flex flex-col md:flex-row gap-8 h-[70vh]">
+            {workflow && workflow.nodeList.length > 0 && (
+              <aside className="w-full md:w-1/3 lg:w-1/4 bg-surface border border-border rounded-xl p-4 flex flex-col h-full">
+                <h3 className="text-lg font-bold mb-3 text-secondary-text flex-shrink-0">
+                  {t('detectedNodesTitle', { count: workflow.nodeList.length })}
+                </h3>
+                <div className="overflow-y-auto pr-2 flex-grow">
+                  <ul className="space-y-2">
+                    {workflow.nodeList.map((node) => (
+                      <li
+                        key={`${node.id}-${node.name}`}
+                        className="font-mono text-sm bg-background/60 p-2 rounded-md transition-all duration-200 ease-in-out hover:bg-gray-600/80 hover:shadow-lg hover:shadow-primary-accent/10"
+                        onMouseEnter={() => setHighlightedNodeId(node.id)}
+                        onMouseLeave={() => setHighlightedNodeId(null)}
+                      >
+                        {node.name}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </aside>
+            )}
+
+            <div className="flex-grow h-full relative">
+              {errorMessage && (
+                <div className="absolute inset-0 bg-red-900/50 text-red-300 flex items-center justify-center p-4 rounded-xl border border-red-700">
+                  <p className="text-center">{errorMessage}</p>
+                </div>
+              )}
+              <div className="w-full h-full rounded-xl overflow-hidden border border-border">
+                <LiteGraphViewer graphData={workflow} highlightedNodeId={highlightedNodeId} />
               </div>
-            </aside>
+            </div>
+          </main>
+
+          {workflow?.notes && workflow.notes.length > 0 && (
+            <section className="w-full mt-8">
+              <h2 className="text-2xl font-bold text-primary-accent mb-4">{t('workflowNotesTitle')}</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {workflow.notes.map(note => (
+                  <div
+                    key={note.id}
+                    className="bg-surface border border-border rounded-xl p-4 transition-all duration-200 hover:border-primary-accent hover:scale-105"
+                    onMouseEnter={() => setHighlightedNodeId(note.id)}
+                    onMouseLeave={() => setHighlightedNodeId(null)}
+                  >
+                    <h3 className="font-mono text-sm text-secondary-accent mb-2">{t('noteLabel', { id: note.id })}</h3>
+                    <div className="text-primary-text font-sans text-base break-words">
+                      {note.type === 'MarkdownNote' ? (
+                        <div className="markdown-content">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{note.text}</ReactMarkdown>
+                        </div>
+                      ) : (
+                        <pre className="whitespace-pre-wrap font-sans">{note.text}</pre>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
           )}
 
-          {/* IT: Area visualizzatore grafo e messaggi di errore. EN: Graph viewer area and error messages. */}
-          <div className="flex-grow h-full relative">
-            {errorMessage && (
-               <div className="absolute inset-0 bg-red-900/50 text-red-300 flex items-center justify-center p-4 rounded-xl border border-red-700">
-                  <p className="text-center">{errorMessage}</p> 
-               </div>
-            )}
-            <div className="w-full h-full rounded-xl overflow-hidden border border-gray-700">
-              <LiteGraphViewer graphData={workflow} highlightedNodeId={highlightedNodeId} />
-            </div>
-          </div>
-        </main>
+          {workflow?.parameters && (
+            <WorkflowParametersDisplay parameters={workflow.parameters} />
+          )}
+        </div>
 
-        {/* IT: Sezione note del workflow. EN: Workflow notes section. */}
-        {workflow?.notes && workflow.notes.length > 0 && (
-          <section className="w-full mt-8">
-            <h2 className="text-2xl font-bold text-yellow-400 mb-4">{t('workflowNotesTitle')}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {workflow.notes.map(note => (
-                <div 
-                  key={note.id} 
-                  className="bg-gray-800 border border-gray-700 rounded-xl p-4 transition-all duration-200 hover:border-yellow-400 hover:scale-105"
-                  onMouseEnter={() => setHighlightedNodeId(note.id)}
-                  onMouseLeave={() => setHighlightedNodeId(null)}
-                >
-                  <h3 className="font-mono text-sm text-yellow-500 mb-2">{t('noteLabel', { id: note.id })}</h3>
-                  <div className="text-gray-300 font-sans text-base break-words">
-                    {note.type === 'MarkdownNote' ? (
-                      <div className="markdown-content">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{note.text}</ReactMarkdown>
-                      </div>
-                    ) : (
-                      <pre className="whitespace-pre-wrap font-sans">{note.text}</pre>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* IT: Sezione parametri del workflow. EN: Workflow parameters section. */}
-        {workflow?.parameters && (
-          <WorkflowParametersDisplay parameters={workflow.parameters} />
-        )}
+        <footer className="w-full text-center py-4 border-t border-border px-4 md:px-8">
+          <p className="text-secondary-text text-sm">
+            {t('footerNote')}
+          </p>
+          <p className="text-gray-600 text-xs mt-1">
+            {t('footerPrivacyNote')}
+          </p>
+          <p className="text-gray-600 text-xs mt-2">
+            <a href={repositoryUrl} target="_blank" rel="noopener noreferrer" className="text-primary-accent hover:underline">{t('footerRepoLink')}</a>
+          </p>
+        </footer>
       </div>
-
-      {/* IT: Footer. EN: Footer. */}
-      <footer className="w-full text-center py-4 border-t border-gray-800 px-4 md:px-8">
-        <p className="text-gray-500 text-sm">
-          {t('footerNote')}
-        </p>
-        <p className="text-gray-600 text-xs mt-1">
-          {t('footerPrivacyNote')}
-        </p>
-        <p className="text-gray-600 text-xs mt-2">
-          <a href={repositoryUrl} target="_blank" rel="noopener noreferrer" className="text-yellow-500 hover:underline">{t('footerRepoLink')}</a>
-        </p>
-      </footer>
     </div>
   );
 }

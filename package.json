@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/p5": "^1.7.6",
     "buffer": "^6.0.3",
     "exifreader": "^4.31.1",
     "i18next": "^25.2.1",
@@ -17,6 +18,7 @@
     "i18next-http-backend": "^3.0.2",
     "litegraph.js": "^0.7.18",
     "music-metadata-browser": "^2.5.11",
+    "p5": "^2.0.4",
     "png-chunks-extract": "^1.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

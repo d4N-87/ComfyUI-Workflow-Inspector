@@ -32,3 +32,34 @@
     @apply font-bold text-gray-100;
   }
 }
+
+/* IT: Stili personalizzati per la scrollbar. EN: Custom scrollbar styles. */
+/* Webkit-based browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  /* IT: Usa il colore di sfondo principale. EN: Use the main background color. */
+  background: theme('colors.background');
+}
+
+::-webkit-scrollbar-thumb {
+  /* IT: Usa il colore secondario di accento. EN: Use the secondary accent color. */
+  background-color: theme('colors.secondary-accent');
+  border-radius: 4px;
+  border: 2px solid theme('colors.background'); /* IT: Crea un piccolo bordo attorno al thumb. EN: Creates a small border around the thumb. */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  /* IT: Scurisce leggermente il colore al passaggio del mouse. EN: Slightly darkens the color on hover. */
+  background-color: #f59e0b;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  /* IT: Colore del thumb e del track. EN: Thumb and track color. */
+  scrollbar-color: theme('colors.secondary-accent') theme('colors.background');
+}
