@@ -50,6 +50,12 @@ const LiteGraphViewer: React.FC<LiteGraphViewerProps> = ({ graphData, highlighte
       canvas.allow_interaction = true;
       canvas.allow_dragcanvas = true;
       canvas.allow_dragnodes = false; // IT: Nodi non trascinabili. EN: Nodes not draggable.
+      
+      // IT: Disabilita la ricerca nodi (doppio click) e il menu contestuale (tasto destro).
+      // EN: Disable node search (double-click) and context menu (right-click).
+      canvas.allow_searchbox = false;
+      canvas.showContextMenu = () => {};
+
       canvas.round_links = true;
       graphRef.current = graph;
 
@@ -62,26 +68,12 @@ const LiteGraphViewer: React.FC<LiteGraphViewerProps> = ({ graphData, highlighte
       }
       handleResize(); // IT: Resize iniziale. EN: Initial resize.
 
-      // IT: Pulizia: de-registra ResizeObserver.
-      // EN: Cleanup: unregister ResizeObserver.
-      // ATTENZIONE: Questa parte di cleanup è stata omessa nel codice originale fornito.
-      // Se era presente nel tuo backup, assicurati di ripristinarla.
-      // Un esempio di cleanup corretto sarebbe:
-      // return () => {
-      //   if (canvasRef.current?.parentElement) {
-      //     resizeObserver.unobserve(canvasRef.current.parentElement);
-      //   }
-      //   resizeObserver.disconnect();
-      // };
+
     }
 
-    // IT: Carica/aggiorna dati del grafo.
-    // EN: Load/update graph data.
-    // Questa logica è stata spostata in un useEffect separato nel codice originale.
-    // Se la logica di caricamento dati era qui, assicurati che sia corretta.
-    // La versione originale fornita aveva questa logica in un useEffect dipendente da [graphData].
-    const graph = graphRef.current; // Questa riga e le successive fino alla fine di questo blocco useEffect
-                                  // erano in un useEffect separato nel codice originale.
+   
+    const graph = graphRef.current; 
+                              
     if (!graph) return;
 
     graph.clear();
@@ -100,19 +92,8 @@ const LiteGraphViewer: React.FC<LiteGraphViewerProps> = ({ graphData, highlighte
     } else {
       graph.stop();
     }
-  // }, [graphData]); // La dipendenza [graphData] era sull'useEffect che conteneva questa logica.
-  // L'useEffect di inizializzazione (quello attuale) dovrebbe avere [] come dipendenza.
-  // Se il codice originale aveva un solo useEffect, allora [graphData] era corretto qui.
-  // Dalla struttura che mi hai dato, sembra che ci fossero DUE useEffect.
-  // 1. Inizializzazione (con dipendenze [])
-  // 2. Aggiornamento dati (con dipendenze [graphData])
-  // Il codice che mi hai fornito per questo file sembra averli fusi o omesso il secondo.
-  // Per favore, verifica con il tuo backup.
-  // Per ora, assumo che il codice fornito sia quello da commentare letteralmente.
-  // Se questo useEffect deve reagire a graphData, la dipendenza [graphData] va aggiunta.
-  // Se è solo per inizializzazione, la dipendenza è [].
-  // Il codice originale che mi hai dato ha [graphData] qui, il che implica che questo
-  // useEffect gestisce sia l'inizializzazione SIA l'aggiornamento dei dati.
+
+    
   }, [graphData]); 
 
 
