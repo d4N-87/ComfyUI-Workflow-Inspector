@@ -50,6 +50,7 @@
   <img src="docs/images/app-screenshot-01.png" alt="ComfyUI Workflow Inspector Home" width="700"/>
   <img src="docs/images/app-screenshot-02.png" alt="ComfyUI Workflow Inspector High Interface" width="700"/>
   <img src="docs/images/app-screenshot-03.png" alt="ComfyUI Workflow Inspector Low Interface" width="700"/>
+  <img src="docs/images/app-screenshot-04.png" alt="ComfyUI Workflow Inspector Low Interface" width="700"/>
 </div>
 
 
