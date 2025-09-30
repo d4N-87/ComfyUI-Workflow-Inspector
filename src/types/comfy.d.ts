@@ -98,6 +98,16 @@ export interface LGraphInstance {
   [key: string]: any;
 }
 
+// IT: Definizione di un Subgraph, usato in workflow complessi.
+// EN: Definition of a Subgraph, used in complex workflows.
+export interface SubgraphDefinition {
+  id: string;
+  name: string;
+  inputs?: { name: string; type: string; [key: string]: any }[];
+  outputs?: { name: string; type: string; [key: string]: any }[];
+  [key: string]: any;
+}
+
 // IT: Dichiarazioni per estendere i tipi di 'litegraph.js'.
 // EN: Declarations to extend 'litegraph.js' types.
 declare module 'litegraph.js' {

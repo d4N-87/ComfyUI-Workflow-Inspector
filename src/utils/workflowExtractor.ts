@@ -2,7 +2,8 @@
 
 import * as mm from 'music-metadata-browser';
 import ExifReader from 'exifreader';
-import type { ApiNode, ApiWorkflow, NormalizedWorkflow, LLink, LGraphGroup, LGraphNode, WorkflowParameters, SamplerParameters } from '../types/comfy';
+import type { ApiNode, ApiWorkflow, NormalizedWorkflow, LLink, LGraphGroup, LGraphNode, WorkflowParameters, SamplerParameters, SubgraphDefinition } from '../types/comfy';
+import { registerDynamicNode } from './litegraph-setup';
 
 // IT: Interfaccia per informazioni sui nodi ComfyUI.
 // EN: Interface for ComfyUI node information.
@@ -139,7 +140,21 @@ export async function extractAndNormalizeWorkflow(
       }
 
       const info = objectInfo[node.type];
-      const correctName = info?.display_name || info?.name || node.type;
+      let correctName = info?.display_name || info?.name || node.type;
+
+      // IT: Gestione dei nodi Subgraph, che hanno un UUID come tipo.
+      // EN: Handle Subgraph nodes, which have a UUID as their type.
+      if (!info && workflowSource.definitions?.subgraphs) {
+        const subgraphDef = workflowSource.definitions.subgraphs.find(
+          (sg: SubgraphDefinition) => sg.id === node.type
+        );
+        if (subgraphDef) {
+          correctName = subgraphDef.name || 'Subgraph'; // IT: Fallback a 'Subgraph'. EN: Fallback to 'Subgraph'.
+          // IT: Registra dinamicamente il tipo di nodo se non esiste.
+          // EN: Dynamically register the node type if it doesn't exist.
+          registerDynamicNode(subgraphDef);
+        }
+      }
 
       if (!node.title || node.title === node.type) {
         node.title = correctName;

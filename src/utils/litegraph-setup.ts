@@ -1,7 +1,7 @@
 // src/utils/litegraph-setup.ts
 
 import { LiteGraph } from 'litegraph.js';
-import type { LGraphNode as LGraphNodeInterface } from '../types/comfy';
+import type { LGraphNode as LGraphNodeInterface, SubgraphDefinition } from '../types/comfy';
 
 // IT: Flag per evitare registrazioni multiple.
 // EN: Flag to prevent multiple registrations.
@@ -83,4 +83,32 @@ export function registerComfyNodes(objectInfo: Record<string, any>): void {
   console.log("✅ Registrazione specifica per 'Reroute' completata.");
 
   hasBeenRegistered = true;
+}
+
+// IT: Registra un tipo di nodo dinamicamente, ad esempio per i Subgraph.
+// EN: Registers a node type dynamically, e.g., for Subgraphs.
+export function registerDynamicNode(subgraphDef: SubgraphDefinition): void {
+  // IT: Controlla se il nodo è già registrato per evitare duplicati.
+  // EN: Check if the node is already registered to avoid duplicates.
+  if (LiteGraph.getNodeType(subgraphDef.id)) {
+    return;
+  }
+
+  console.log(`Registrazione dinamica del nodo: ${subgraphDef.name} (${subgraphDef.id})`);
+
+  // IT: Costruttore per il nodo Subgraph.
+  // EN: Constructor for the Subgraph node.
+  const SubgraphNodeConstructor = function(this: LGraphNodeInterface) {
+    // IT: Aggiunge input e output basandosi sulla definizione del Subgraph.
+    // EN: Add inputs and outputs based on the Subgraph definition.
+    subgraphDef.inputs?.forEach(input => {
+      this.addInput(input.name, input.type);
+    });
+    subgraphDef.outputs?.forEach(output => {
+      this.addOutput(output.name, output.type);
+    });
+  };
+
+  LiteGraph.registerNodeType(subgraphDef.id, SubgraphNodeConstructor as any);
+  console.log(`✅ Nodo ${subgraphDef.name} registrato dinamicamente.`);
 }
