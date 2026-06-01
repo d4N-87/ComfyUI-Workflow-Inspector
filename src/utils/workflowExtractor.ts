@@ -2,7 +2,7 @@
 
 import * as mm from 'music-metadata-browser';
 import ExifReader from 'exifreader';
-import type { ApiNode, ApiWorkflow, NormalizedWorkflow, LLink, LGraphGroup, LGraphNode, WorkflowParameters, SamplerParameters, SubgraphDefinition } from '../types/comfy';
+import type { ApiNode, NormalizedWorkflow, LLink, LGraphGroup, LGraphNode, WorkflowParameters, SamplerParameters, SubgraphDefinition } from '../types/comfy';
 import { registerDynamicNode } from './litegraph-setup';
 import { isWidgetInput, getInputType, isSeedInput, SEED_CONTROL_VALUES } from './comfyWidgets';
 
@@ -137,15 +137,50 @@ function extractCustomSamplerParameters(
   };
 }
 
+// IT: Tipo di file riconosciuto, usato per scegliere come estrarre il workflow.
+// EN: Recognized file kind, used to choose how to extract the workflow.
+type FileKind = 'json' | 'image' | 'audio' | 'video' | 'unknown';
+
+// IT: Errore sollevato quando il file CONTIENE dei dati ma non sono leggibili/validi come workflow
+//     (es. JSON corrotto). Diverso dal semplice "nessun workflow presente" (che ritorna null).
+// EN: Error thrown when the file CONTAINS data that isn't readable/valid as a workflow
+//     (e.g. corrupt JSON). Different from a plain "no workflow present" (which returns null).
+export class WorkflowParseError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'WorkflowParseError';
+  }
+}
+
+// IT: Determina il tipo di file usando prima il MIME e, se assente/inaffidabile, l'estensione.
+//     Il MIME a volte è vuoto (es. file trascinati o senza tipo registrato dal sistema).
+// EN: Determines the file kind using the MIME type first and, if missing/unreliable, the extension.
+//     The MIME is sometimes empty (e.g. dragged files or with no system-registered type).
+function getFileKind(file: File): FileKind {
+  const type = file.type;
+  if (type === 'application/json') return 'json';
+  if (type.startsWith('image/')) return 'image';
+  if (type.startsWith('audio/')) return 'audio';
+  if (type.startsWith('video/')) return 'video';
+
+  // IT: Fallback sull'estensione. EN: Fallback to the file extension.
+  const ext = file.name.split('.').pop()?.toLowerCase();
+  switch (ext) {
+    case 'json': return 'json';
+    case 'png': case 'webp': case 'jpg': case 'jpeg': return 'image';
+    case 'flac': case 'mp3': case 'ogg': case 'wav': return 'audio';
+    case 'mp4': case 'webm': case 'mov': return 'video';
+    default: return 'unknown';
+  }
+}
+
 // IT: Estrae la stringa JSON del workflow da metadati di file audio/video o immagini.
 // EN: Extracts workflow JSON string from audio/video or image file metadata.
-async function extractFromFile(file: File): Promise<string | null> {
-  const fileType = file.type;
-  
+async function extractFromFile(file: File, kind: FileKind): Promise<string | null> {
   try {
     // IT: Gestione file audio/video.
     // EN: Handle audio/video files.
-    if (fileType.startsWith('audio/') || fileType.startsWith('video/')) {
+    if (kind === 'audio' || kind === 'video') {
       const metadata = await mm.parseBlob(file);
       // IT: Cerca nei commenti comuni.
       // EN: Search in common comments.
@@ -166,7 +201,7 @@ async function extractFromFile(file: File): Promise<string | null> {
     
     // IT: Gestione file immagine.
     // EN: Handle image files.
-    if (fileType.startsWith('image/')) {
+    if (kind === 'image') {
       const buffer = await file.arrayBuffer();
       const tags: any = await ExifReader.load(buffer);
       // IT: Cerca nei tag EXIF 'workflow' o 'prompt'.
@@ -183,7 +218,7 @@ async function extractFromFile(file: File): Promise<string | null> {
     }
     return null;
   } catch (error) {
-    console.error(`Errore durante l'estrazione da ${fileType}:`, error);
+    console.error(`Errore durante l'estrazione da un file di tipo '${kind}':`, error);
     return null;
   }
 }
@@ -197,27 +232,46 @@ export async function extractAndNormalizeWorkflow(
   let jsonString: string | null = null;
   
   try {
-    // IT: Ottiene la stringa JSON del workflow.
-    // EN: Get the workflow JSON string.
-    if (file.type === 'application/json') {
+    // IT: Sceglie come ottenere il JSON in base al tipo di file (MIME, con fallback sull'estensione).
+    // EN: Choose how to get the JSON based on the file kind (MIME, with extension fallback).
+    const kind = getFileKind(file);
+    if (kind === 'json') {
       jsonString = await file.text();
+    } else if (kind === 'unknown') {
+      return null; // IT: formato non supportato → nessun workflow. EN: unsupported format → no workflow.
     } else {
-      jsonString = await extractFromFile(file);
+      jsonString = await extractFromFile(file, kind);
     }
 
-    if (!jsonString) return null;
+    if (!jsonString) return null; // IT: nessun metadato di workflow nel file. EN: no workflow metadata in the file.
 
-    // IT: Parsing della stringa JSON, gestendo possibile doppio encoding.
-    // EN: Parse JSON string, handling possible double encoding.
-    let data = JSON.parse(jsonString.trim());
-    if (typeof data === 'string') data = JSON.parse(data);
-    
+    // IT: Parsing del JSON (gestendo il doppio encoding). Un errore qui significa dati CORROTTI,
+    //     non assenza di workflow: lo segnaliamo con un errore tipizzato.
+    // EN: Parse the JSON (handling double encoding). An error here means CORRUPT data,
+    //     not an absent workflow: we signal it with a typed error.
+    let data: any;
+    try {
+      data = JSON.parse(jsonString.trim());
+      if (typeof data === 'string') data = JSON.parse(data);
+    } catch {
+      throw new WorkflowParseError('I dati del workflow contenuti nel file sembrano corrotti.');
+    }
+
     // IT: Identifica la sorgente dati del workflow (root, 'prompt', o 'workflow').
     // EN: Identify workflow data source (root, 'prompt', or 'workflow').
     let workflowSource = data;
-    if (data.prompt) workflowSource = data.prompt;
-    if (data.workflow) workflowSource = data.workflow;
-    if (typeof workflowSource === 'string') workflowSource = JSON.parse(workflowSource);
+    if (data?.prompt) workflowSource = data.prompt;
+    if (data?.workflow) workflowSource = data.workflow;
+    if (typeof workflowSource === 'string') {
+      try {
+        workflowSource = JSON.parse(workflowSource);
+      } catch {
+        throw new WorkflowParseError('I dati del workflow contenuti nel file sembrano corrotti.');
+      }
+    }
+
+    // IT: Se non è un oggetto, non è un workflow valido. EN: If it's not an object, it's not a valid workflow.
+    if (!workflowSource || typeof workflowSource !== 'object') return null;
 
     let nodes: LGraphNode[] = []; 
     let links: LLink[] = [];
@@ -227,13 +281,18 @@ export async function extractAndNormalizeWorkflow(
     // EN: Normalize nodes and links from LiteGraph or API formats.
     if (Array.isArray(workflowSource.nodes)) { // IT: Formato LiteGraph. EN: LiteGraph format.
       nodes = workflowSource.nodes;
-      links = workflowSource.links;
+      links = Array.isArray(workflowSource.links) ? workflowSource.links : [];
     } else { // IT: Formato API. EN: API format.
-      const apiFormat: ApiWorkflow = workflowSource;
       let linkIdCounter = 1;
-      Object.entries(apiFormat).forEach(([id, details]: [string, ApiNode]) => {
-        const { inputs, ...nodeData } = details;
-        nodes.push({ id: Number(id), type: details.class_type, ...nodeData } as unknown as LGraphNode);
+      Object.entries(workflowSource as Record<string, unknown>).forEach(([id, details]) => {
+        // IT: Considera solo le voci che sembrano davvero nodi (oggetti con class_type). Questo
+        //     evita di interpretare un JSON qualsiasi come workflow generando "nodi spazzatura".
+        // EN: Only consider entries that actually look like nodes (objects with class_type). This
+        //     avoids treating arbitrary JSON as a workflow and producing "garbage nodes".
+        if (!details || typeof details !== 'object' || !('class_type' in details)) return;
+        const node = details as ApiNode;
+        const { inputs, ...nodeData } = node;
+        nodes.push({ id: Number(id), type: node.class_type, ...nodeData } as unknown as LGraphNode);
         // IT: Crea link dagli input.
         // EN: Create links from inputs.
         if (inputs) {
@@ -246,6 +305,8 @@ export async function extractAndNormalizeWorkflow(
       });
     }
 
+    // IT: Nessun nodo valido = il file non contiene un workflow ComfyUI riconoscibile.
+    // EN: No valid nodes = the file doesn't contain a recognizable ComfyUI workflow.
     if (nodes.length === 0) return null;
 
     const nodeList: { id: string; name: string }[] = [];
@@ -361,6 +422,11 @@ export async function extractAndNormalizeWorkflow(
     return { nodes, links, groups, nodeList, notes: extractedNotes, parameters };
 
   } catch (error) {
+    // IT: Gli errori di "dati corrotti" vengono propagati, per mostrare un messaggio specifico.
+    //     Gli altri errori imprevisti vengono loggati e trattati come "nessun workflow".
+    // EN: "Corrupt data" errors are propagated to show a specific message.
+    //     Other unexpected errors are logged and treated as "no workflow".
+    if (error instanceof WorkflowParseError) throw error;
     console.error(`Errore finale nel processare il workflow per ${file.name}:`, error);
     return null;
   }

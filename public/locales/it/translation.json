@@ -18,6 +18,7 @@
   "errorLoadingFile": "Errore durante il caricamento del file: {{error}}",
   "errorNoWorkflow": "Nessun workflow ComfyUI trovato nel file o formato non supportato.",
   "errorUnexpected": "Si è verificato un errore imprevisto durante l'analisi del file.",
+  "errorCorruptFile": "Il file contiene dati di un workflow, ma sembrano corrotti o illeggibili.",
   "errorInit": "Impossibile inizializzare l'applicazione. Controlla la console.",
   "errorNodeDefs": "Definizioni dei nodi non ancora caricate. Riprova tra un secondo.",
   "footerNote": "Nota: La visualizzazione del workflow è una rappresentazione schematica per l'ispezione del flusso e della posizione dei nodi. Non è un'interfaccia interattiva. Per la visualizzazione completa aprire il file in ComfyUI.",

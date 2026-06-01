@@ -18,6 +18,7 @@
   "errorLoadingFile": "Error al cargar el archivo: {{error}}",
   "errorNoWorkflow": "No se encontró ningún flujo de trabajo de ComfyUI en el archivo o formato no compatible.",
   "errorUnexpected": "Ocurrió un error inesperado al analizar el archivo.",
+  "errorCorruptFile": "El archivo contiene datos de un flujo de trabajo, pero parecen estar corruptos o ilegibles.",
   "errorInit": "No se pudo inicializar la aplicación. Compruebe la consola.",
   "errorNodeDefs": "Definiciones de nodos aún no cargadas. Inténtelo de nuevo en un segundo.",
   "footerNote": "Nota: La visualización del flujo de trabajo es una representación esquemática para inspeccionar el flujo y la posición de los nodos. No es una interfaz interactiva. Para una visualización completa, abra el archivo en ComfyUI.",

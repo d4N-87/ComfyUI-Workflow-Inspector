@@ -52,4 +52,12 @@ describe('estrazione da file reali (PNG/WebP)', () => {
     expect(result!.parameters?.positivePrompt).toMatch(/panda/i);
     expect(result!.parameters?.samplers[0]?.samplerName).toBe('euler');
   });
+
+  it('estrae dal PNG anche senza MIME, usando l’estensione (#9, caso drag & drop)', async () => {
+    // IT: I file trascinati a volte arrivano con type vuoto: deve valere l'estensione .png.
+    // EN: Dragged files sometimes arrive with an empty type: the .png extension must be used.
+    const result = await extractAndNormalizeWorkflow(fileFromDisk('sample.png', ''), objectInfo);
+    expect(result).not.toBeNull();
+    expect(result!.parameters?.positivePrompt).toMatch(/panda/i);
+  });
 });

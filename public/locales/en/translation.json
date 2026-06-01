@@ -18,6 +18,7 @@
   "errorLoadingFile": "Error loading file: {{error}}",
   "errorNoWorkflow": "No ComfyUI workflow found in the file or unsupported format.",
   "errorUnexpected": "An unexpected error occurred while parsing the file.",
+  "errorCorruptFile": "The file contains workflow data, but it appears to be corrupt or unreadable.",
   "errorInit": "Could not initialize the application. Check the console.",
   "errorNodeDefs": "Node definitions not yet loaded. Please try again in a second.",
   "footerNote": "Note: The workflow display is a schematic representation for inspecting the flow and position of nodes. It is not an interactive interface. For full visualization, open the file in ComfyUI.",

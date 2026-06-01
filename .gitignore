@@ -1,5 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# Local tooling (Claude Code preview launch config)
+.claude/
+
 # Dependency directories
 node_modules/
 .pnp # Yarn PnP

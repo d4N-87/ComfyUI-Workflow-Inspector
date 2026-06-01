@@ -6,7 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useTranslation } from 'react-i18next';
 
-import { extractAndNormalizeWorkflow } from './utils/workflowExtractor';
+import { extractAndNormalizeWorkflow, WorkflowParseError } from './utils/workflowExtractor';
 import { registerComfyNodes } from './utils/litegraph-setup';
 import LiteGraphViewer from './components/LiteGraphViewer';
 import WorkflowParametersDisplay from './components/WorkflowParameters';
@@ -89,7 +89,9 @@ function App() {
       }
     } catch (error) {
       console.error(t('errorLoadingFile', { error: (error as Error).message }), error);
-      setErrorMessage(t('errorUnexpected'));
+      // IT: Distingue i dati corrotti (messaggio specifico) dagli errori imprevisti.
+      // EN: Distinguishes corrupt data (specific message) from unexpected errors.
+      setErrorMessage(error instanceof WorkflowParseError ? t('errorCorruptFile') : t('errorUnexpected'));
     }
   };
 

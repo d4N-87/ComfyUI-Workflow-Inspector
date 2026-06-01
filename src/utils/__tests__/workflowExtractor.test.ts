@@ -6,7 +6,7 @@
 //     of the function, acting as a safety net before refactoring the logic.
 
 import { describe, it, expect } from 'vitest';
-import { extractAndNormalizeWorkflow } from '../workflowExtractor';
+import { extractAndNormalizeWorkflow, WorkflowParseError } from '../workflowExtractor';
 
 // IT: object_info minimale, sufficiente per i nodi usati nei test.
 // EN: Minimal object_info, enough for the nodes used in the tests.
@@ -245,19 +245,41 @@ describe('extractAndNormalizeWorkflow — formato API', () => {
   });
 });
 
-describe('extractAndNormalizeWorkflow — input non valido', () => {
-  // IT: BUG NOTO (da correggere in Step 2 #8 - validazione/gestione errori).
-  //     Un JSON che non è un workflow dovrebbe restituire null, ma oggi viene interpretato
-  //     come "formato API" e produce un nodo spazzatura (id: NaN, type: undefined).
-  //     Quando sistemeremo la validazione, questo test diventerà rosso e l'aspettativa
-  //     andrà cambiata in `toBeNull()`.
-  // EN: KNOWN BUG (to fix in Step 2 #8 - validation/error handling).
-  //     A non-workflow JSON should return null, but today it is treated as "API format"
-  //     and produces a garbage node (id: NaN, type: undefined).
-  //     Once validation is fixed, this test will go red and the expectation should
-  //     become `toBeNull()`.
-  it('documenta il comportamento attuale: NON restituisce null per un JSON privo di nodi (bug noto)', async () => {
+describe('extractAndNormalizeWorkflow — input non valido (#8)', () => {
+  // IT: Bug del "nodo spazzatura" ora CORRETTO: un JSON che non è un workflow deve dare null.
+  // EN: The "garbage node" bug is now FIXED: a non-workflow JSON must return null.
+  it('restituisce null per un JSON che non è un workflow', async () => {
     const result = await extractAndNormalizeWorkflow(jsonFile({ foo: 'bar' }), mockObjectInfo);
+    expect(result).toBeNull();
+  });
+
+  // IT: Dati presenti ma corrotti -> errore tipizzato (per mostrare un messaggio specifico).
+  // EN: Present but corrupt data -> typed error (to show a specific message).
+  it('solleva WorkflowParseError per un JSON corrotto', async () => {
+    const corruptFile = new File(['{ this is not valid json ]'], 'broken.json', { type: 'application/json' });
+    await expect(extractAndNormalizeWorkflow(corruptFile, mockObjectInfo)).rejects.toBeInstanceOf(WorkflowParseError);
+  });
+});
+
+describe('extractAndNormalizeWorkflow — rilevamento file robusto (#9)', () => {
+  const litegraphWorkflow = {
+    nodes: [{ id: 1, type: 'KSampler', order: 0, widgets_values: [1, 'fixed', 20, 7, 'euler', 'normal', 1] }],
+    links: [],
+    groups: [],
+  };
+
+  it('riconosce un JSON dall’estensione anche senza MIME (type vuoto)', async () => {
+    // IT: Alcuni file trascinati arrivano senza MIME: deve valere l'estensione .json.
+    // EN: Some dragged files arrive without MIME: the .json extension must be used.
+    const noMimeFile = new File([JSON.stringify(litegraphWorkflow)], 'workflow.json', { type: '' });
+    const result = await extractAndNormalizeWorkflow(noMimeFile, mockObjectInfo);
     expect(result).not.toBeNull();
+    expect(result!.nodeList).toHaveLength(1);
+  });
+
+  it('restituisce null per un’estensione non supportata', async () => {
+    const oddFile = new File(['hello'], 'notes.txt', { type: '' });
+    const result = await extractAndNormalizeWorkflow(oddFile, mockObjectInfo);
+    expect(result).toBeNull();
   });
 });
