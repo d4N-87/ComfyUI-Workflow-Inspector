@@ -34,71 +34,80 @@ const HIGHLIGHT_COLOR = "#FFD700"; // IT: Colore per evidenziare nodi. EN: Color
 const LiteGraphViewer: React.FC<LiteGraphViewerProps> = ({ graphData, highlightedNodeId }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null); // IT: Riferimento al canvas HTML. EN: Reference to the HTML canvas.
   const graphRef = useRef<LGraphInstance | null>(null); // IT: Riferimento all'istanza LGraph. EN: Reference to the LGraph instance.
+  // IT: Riferimento all'istanza LGraphCanvas (tipo strutturale: serve solo l'helper di zoom).
+  // EN: Reference to the LGraphCanvas instance (structural type: only the zoom helper is needed).
+  const canvasInstanceRef = useRef<{ ds: { zoomFit: (center?: boolean) => void } } | null>(null);
   const lastHighlightedNode = useRef<LGraphNode | null>(null); // IT: Ultimo nodo evidenziato. EN: Last highlighted node.
 
-  // IT: Effetto per inizializzare LiteGraph e gestire il resize.
-  // EN: Effect to initialize LiteGraph and handle resize.
+  // IT: Effetto di inizializzazione (una sola volta): crea grafo, canvas e gestione del resize.
+  //     Il cleanup ferma il rendering e disconnette l'observer, evitando memory leak allo smontaggio.
+  // EN: Initialization effect (once): creates the graph, canvas and resize handling.
+  //     The cleanup stops rendering and disconnects the observer, preventing a memory leak on unmount.
   useEffect(() => {
-    // IT: Inizializza grafo e canvas se non esistono.
-    // EN: Initialize graph and canvas if they don't exist.
-    if (!graphRef.current && canvasRef.current) {
-      const graph = new LGraph();
-      const canvas = new LGraphCanvas(canvasRef.current, graph);
-      canvas.link_type_colors = (LGraphCanvas as any).link_type_colors;
-      // IT: Configurazione interazioni canvas.
-      // EN: Canvas interaction configuration.
-      canvas.allow_interaction = true;
-      canvas.allow_dragcanvas = true;
-      // IT: Trascinamento nodi attivo (stile ComfyUI). In litegraph il toggle di collasso (click sul
-      //     titolo) è agganciato a questo flag, quindi così si possono anche aprire/chiudere i nodi.
-      // EN: Node dragging enabled (ComfyUI-style). In litegraph the collapse toggle (title click) is
-      //     tied to this flag, so this also lets nodes be expanded/collapsed.
-      canvas.allow_dragnodes = true;
-      
-      // IT: Disabilita la ricerca nodi (doppio click) e il menu contestuale (tasto destro).
-      // EN: Disable node search (double-click) and context menu (right-click).
-      canvas.allow_searchbox = false;
-      canvas.showContextMenu = () => {};
+    if (!canvasRef.current) return;
 
-      canvas.round_links = true;
-      graphRef.current = graph;
+    const graph = new LGraph();
+    const canvas = new LGraphCanvas(canvasRef.current, graph);
+    canvas.link_type_colors = (LGraphCanvas as any).link_type_colors;
+    // IT: Configurazione interazioni canvas.
+    // EN: Canvas interaction configuration.
+    canvas.allow_interaction = true;
+    canvas.allow_dragcanvas = true;
+    // IT: Trascinamento nodi attivo (stile ComfyUI). In litegraph il toggle di collasso (click sul
+    //     titolo) è agganciato a questo flag, quindi così si possono anche aprire/chiudere i nodi.
+    // EN: Node dragging enabled (ComfyUI-style). In litegraph the collapse toggle (title click) is
+    //     tied to this flag, so this also lets nodes be expanded/collapsed.
+    canvas.allow_dragnodes = true;
 
-      // IT: Gestione resize del canvas.
-      // EN: Canvas resize handling.
-      const handleResize = () => canvas.resize();
-      const resizeObserver = new ResizeObserver(handleResize);
-      if (canvasRef.current.parentElement) {
-        resizeObserver.observe(canvasRef.current.parentElement);
-      }
-      handleResize(); // IT: Resize iniziale. EN: Initial resize.
+    // IT: Disabilita la ricerca nodi (doppio click) e il menu contestuale (tasto destro).
+    // EN: Disable node search (double-click) and context menu (right-click).
+    canvas.allow_searchbox = false;
+    canvas.showContextMenu = () => {};
 
+    canvas.round_links = true;
+    graphRef.current = graph;
+    canvasInstanceRef.current = canvas;
 
-    }
+    // IT: Gestione resize del canvas tramite ResizeObserver sul contenitore.
+    // EN: Canvas resize handling via a ResizeObserver on the container.
+    const handleResize = () => canvas.resize();
+    const resizeObserver = new ResizeObserver(handleResize);
+    const parent = canvasRef.current.parentElement;
+    if (parent) resizeObserver.observe(parent);
+    handleResize(); // IT: Resize iniziale. EN: Initial resize.
 
-   
-    const graph = graphRef.current; 
-                              
+    return () => {
+      resizeObserver.disconnect();
+      // IT: Ferma il loop di rendering del canvas (altrimenti continuerebbe dopo lo smontaggio).
+      // EN: Stop the canvas render loop (otherwise it would keep running after unmount).
+      (canvas as any).stopRendering?.();
+      graph.stop();
+      graphRef.current = null;
+      canvasInstanceRef.current = null;
+    };
+  }, []);
+
+  // IT: Effetto per caricare/aggiornare i dati del grafo quando cambia graphData.
+  // EN: Effect to load/update the graph data when graphData changes.
+  useEffect(() => {
+    const graph = graphRef.current;
     if (!graph) return;
 
     graph.clear();
     if (graphData && graphData.nodes.length > 0) {
       graph.configure(graphData);
-      graph.start();
-      
-      // IT: Zoom per adattare il grafo.
-      // EN: Zoom to fit the graph.
-      setTimeout(() => {
-        const canvasInstance = (graphRef.current as any)._canvas;
-        if (canvasInstance) {
-          canvasInstance.ds.zoomFit(false);
-        }
-      }, 50);
+      // IT: Niente graph.start(): per un visualizzatore non serve il loop di ESECUZIONE del grafo
+      //     (spreca CPU/batteria). Il canvas ha già il proprio loop di rendering per pan/zoom/drag.
+      // EN: No graph.start(): a viewer doesn't need the graph EXECUTION loop (wastes CPU/battery).
+      //     The canvas already runs its own render loop for pan/zoom/drag.
+      requestAnimationFrame(() => {
+        canvasInstanceRef.current?.ds?.zoomFit?.(false); // IT: adatta lo zoom al grafo. EN: fit zoom to the graph.
+        graph.setDirtyCanvas(true, true);
+      });
     } else {
-      graph.stop();
+      graph.setDirtyCanvas(true, true); // IT: ridisegna la tela vuota. EN: redraw the empty canvas.
     }
-
-    
-  }, [graphData]); 
+  }, [graphData]);
 
 
   // IT: Effetto per evidenziare i nodi.
