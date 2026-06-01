@@ -21,25 +21,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 18 # IT: Specifica la versione di Node.js. EN: Specify Node.js version.
+          node-version: 22 # IT: Node.js LTS. EN: Node.js LTS.
           cache: 'npm'     # IT: Abilita cache per npm. EN: Enable npm cache.
 
       - name: Install dependencies
-        run: npm install # IT: Sostituire con yarn/pnpm se necessario. EN: Replace with yarn/pnpm if needed.
+        run: npm ci # IT: Build riproducibile dal package-lock. EN: Reproducible build from the package-lock.
 
       - name: Build application
-        run: npm run build # IT: Sostituire con yarn/pnpm se necessario. EN: Replace with yarn/pnpm if needed.
+        run: npm run build
 
       - name: Setup Pages
-        uses: actions/configure-pages@v4 # IT: Prepara l'ambiente per il deploy su GitHub Pages. EN: Prepares environment for GitHub Pages deployment.
+        uses: actions/configure-pages@v6 # IT: Prepara l'ambiente per il deploy su GitHub Pages. EN: Prepares environment for GitHub Pages deployment.
 
       - name: Upload build artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: './dist' # IT: Carica la cartella 'dist' come artefatto per Pages. EN: Upload 'dist' folder as Pages artifact.
 
@@ -52,4 +52,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4 # IT: Action ufficiale per il deploy su GitHub Pages. EN: Official action for deploying to GitHub Pages.
+        uses: actions/deploy-pages@v5 # IT: Action ufficiale per il deploy su GitHub Pages. EN: Official action for deploying to GitHub Pages.
