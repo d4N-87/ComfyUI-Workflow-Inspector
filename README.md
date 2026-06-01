@@ -23,12 +23,12 @@
 
 ## ✨ Funzionalità / Features
 
-*   🇮🇹 **Caricamento Intelligente**: Supporta workflow da file PNG, WebP, MP4, FLAC e JSON.
-    🇬🇧 **Smart Upload**: Supports workflows from PNG, WebP, MP4, FLAC, and JSON files.
+*   🇮🇹 **Caricamento Intelligente**: Supporta workflow da file PNG, WebP, MP4, FLAC e JSON, sia col pulsante sia trascinando il file (drag & drop) ovunque sulla pagina.
+    🇬🇧 **Smart Upload**: Supports workflows from PNG, WebP, MP4, FLAC, and JSON files, either via the button or by dragging & dropping the file anywhere on the page.
 *   🇮🇹 **Visualizzazione Nodi**: Elenco chiaro dei nodi rilevati nel workflow.
     🇬🇧 **Node Display**: Clear list of detected nodes in the workflow.
-*   🇮🇹 **Rendering Grafo Interattivo**: Grafo del workflow renderizzato con [LiteGraph.js](https://github.com/jagenjo/litegraph.js), con colori dei link e nomi dei nodi il più possibile fedeli a ComfyUI (basati su `object_info.json`).
-    🇬🇧 **Interactive Graph Rendering**: Workflow graph rendered using [LiteGraph.js](https://github.com/jagenjo/litegraph.js), with link colors and node names as faithful as possible to ComfyUI (based on `object_info.json`).
+*   🇮🇹 **Rendering Grafo Interattivo**: Grafo renderizzato con [LiteGraph.js](https://github.com/jagenjo/litegraph.js), con i widget dei nodi (seed, steps, cfg, sampler…), colori dei link e nomi il più possibile fedeli a ComfyUI (basati su `object_info.json`). I nodi si possono spostare e collassare/espandere.
+    🇬🇧 **Interactive Graph Rendering**: Graph rendered using [LiteGraph.js](https://github.com/jagenjo/litegraph.js), with node widgets (seed, steps, cfg, sampler…), link colors and names as faithful as possible to ComfyUI (based on `object_info.json`). Nodes can be moved and collapsed/expanded.
 *   🇮🇹 **Visualizzazione Note**: Le note del workflow (normali e Markdown) sono mostrate in una sezione dedicata.
     🇬🇧 **Notes Display**: Workflow notes (both regular and Markdown) are shown in a dedicated section.
 *   🇮🇹 **Parametri di elaborazione**: I dati di elaborazione sono riportati in una sezione dedicata.
@@ -64,6 +64,7 @@
 *   [i18next](https://www.i18next.com/) (per l'internazionalizzazione)
 *   [ExifReader](https://github.com/mattiasw/ExifReader) (per metadati immagini)
 *   [music-metadata-browser](https://github.com/Borewit/music-metadata-browser) (per metadati audio/video)
+*   [Vitest](https://vitest.dev/) (per i test / for testing)
 
 ## 🛠️ Come Eseguire Localmente / How to Run Locally
 
@@ -106,12 +107,19 @@
     🇮🇹 L'applicazione sarà disponibile su `http://localhost:5173` (o un'altra porta se 5173 è occupata).
     🇬🇧 The application will be available at `http://localhost:5173` (or another port if 5173 is busy).
 
+4.  **Esegui i test / Run the tests:**
+    ```bash
+    npm test
+    ```
+    🇮🇹 I test (con [Vitest](https://vitest.dev/)) coprono la logica di estrazione dei workflow.
+    🇬🇧 The tests (using [Vitest](https://vitest.dev/)) cover the workflow extraction logic.
+
 ## 📖 Come Usare / How to Use
 
 1.  🇮🇹 Apri l'applicazione nel tuo browser (tramite la demo live o eseguendola localmente).
     🇬🇧 Open the application in your browser (either via the live demo or by running it locally).
-2.  🇮🇹 Clicca sul pulsante "Carica File Workflow" (o il testo tradotto).
-    🇬🇧 Click the "Upload Workflow File" button (or its translated equivalent).
+2.  🇮🇹 Clicca sul pulsante "Carica File Workflow" (o il testo tradotto), oppure trascina direttamente il file sulla pagina.
+    🇬🇧 Click the "Upload Workflow File" button (or its translated equivalent), or simply drag the file onto the page.
 3.  🇮🇹 Seleziona un file PNG, WebP, MP4, FLAC o JSON che contiene metadati di un workflow ComfyUI.
     🇬🇧 Select a PNG, WebP, MP4, FLAC, or JSON file containing ComfyUI workflow metadata.
 4.  🇮🇹 L'applicazione estrarrà e visualizzerà la lista dei nodi, il grafo del workflow e le note associate.
@@ -148,8 +156,8 @@ All analysis and visualization occur locally on your machine.
 4.  Fai Push sul tuo branch (`git push origin feature/AmazingFeature`). / Push to your branch (`git push origin feature/AmazingFeature`).
 5.  Apri una Pull Request. / Open a Pull Request.
 
-🇮🇹 Per favore, assicurati che il tuo codice segua le linee guida di stile del progetto e includa test appropriati se necessario.
-🇬🇧 Please ensure your code follows the project's styling guidelines and includes appropriate tests if necessary.
+🇮🇹 Per favore, assicurati che il tuo codice segua le linee guida di stile del progetto e che i test passino (`npm test`), aggiungendone di nuovi quando opportuno.
+🇬🇧 Please ensure your code follows the project's styling guidelines and that the tests pass (`npm test`), adding new ones where appropriate.
 
 ## 📜 Licenza / License
 
