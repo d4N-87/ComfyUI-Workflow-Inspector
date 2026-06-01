@@ -4,6 +4,7 @@ import * as mm from 'music-metadata-browser';
 import ExifReader from 'exifreader';
 import type { ApiNode, ApiWorkflow, NormalizedWorkflow, LLink, LGraphGroup, LGraphNode, WorkflowParameters, SamplerParameters, SubgraphDefinition } from '../types/comfy';
 import { registerDynamicNode } from './litegraph-setup';
+import { isWidgetInput, getInputType, isSeedInput, SEED_CONTROL_VALUES } from './comfyWidgets';
 
 // IT: Interfaccia per informazioni sui nodi ComfyUI.
 // EN: Interface for ComfyUI node information.
@@ -11,6 +12,129 @@ interface ComfyNodeInfo {
   name: string;
   display_name?: string;
   [key: string]: any;
+}
+
+// IT: Tipi di nodo "passanti": non contengono il dato, lo lasciano solo transitare.
+//     Vanno attraversati per risalire alla vera sorgente (es. un Reroute tra il prompt e il sampler).
+// EN: "Pass-through" node types: they don't hold the data, they just let it flow through.
+//     They are traversed to reach the true source (e.g. a Reroute between the prompt and the sampler).
+const PASS_THROUGH_NODE_TYPES = new Set(['Reroute', 'PrimitiveNode']);
+
+// IT: Risale i collegamenti partendo da un input con un dato nome (es. 'positive') e restituisce
+//     il NODO di origine, attraversando i nodi passanti (Reroute) e proteggendosi dai cicli.
+// EN: Walks the links from a named input (e.g. 'positive') and returns the ORIGIN node,
+//     traversing pass-through nodes (Reroute) and guarding against cycles.
+function followInput(
+  startNode: LGraphNode,
+  inputName: string,
+  nodesById: Map<number, LGraphNode>,
+  linksById: Map<number, LLink>,
+): LGraphNode | undefined {
+  const visited = new Set<number>();
+  let input = startNode.inputs?.find(i => i.name === inputName);
+
+  while (input && input.link != null) {
+    const link = linksById.get(input.link);
+    if (!link) return undefined;
+    const originNode = nodesById.get(link[1]); // IT: link[1] = id nodo di origine. EN: link[1] = origin node id.
+    if (!originNode || visited.has(originNode.id)) return undefined; // IT: stop su nodo mancante o ciclo. EN: stop on missing node or cycle.
+    visited.add(originNode.id);
+
+    if (PASS_THROUGH_NODE_TYPES.has(originNode.type)) {
+      input = originNode.inputs?.[0]; // IT: prosegue a ritroso attraverso il nodo passante. EN: keep walking back through the pass-through node.
+      continue;
+    }
+    return originNode;
+  }
+  return undefined;
+}
+
+// IT: Come followInput, ma restituisce il primo valore testuale del nodo di origine
+//     (tipicamente il testo di un CLIPTextEncode).
+// EN: Like followInput, but returns the first text value of the origin node
+//     (typically the text of a CLIPTextEncode).
+function traceTextFromInput(
+  startNode: LGraphNode,
+  inputName: string,
+  nodesById: Map<number, LGraphNode>,
+  linksById: Map<number, LLink>,
+): string | undefined {
+  const origin = followInput(startNode, inputName, nodesById, linksById);
+  const value = origin?.widgets_values?.[0];
+  return typeof value === 'string' ? value : undefined;
+}
+
+// IT: Costruisce una mappa { nomeWidget -> valore } per un nodo, basandosi sulla definizione
+//     in object_info. È robusta perché segue i NOMI invece di indici fissi, salta gli input che
+//     sono collegamenti (socket) e gestisce il widget extra "control_after_generate" dopo i seed.
+// EN: Builds a { widgetName -> value } map for a node, based on its object_info definition.
+//     Robust because it follows NAMES instead of fixed indices, skips link inputs (sockets),
+//     and handles the extra "control_after_generate" widget after seeds.
+function buildWidgetMap(
+  node: LGraphNode,
+  objectInfo: Record<string, ComfyNodeInfo>,
+): Record<string, unknown> {
+  const info = objectInfo[node.type];
+  const values = node.widgets_values;
+  const map: Record<string, unknown> = {};
+  if (!info?.input || !Array.isArray(values)) return map;
+
+  // IT: Input che in QUESTO nodo sono stati convertiti in socket: non occupano widgets_values.
+  // EN: Inputs that in THIS node were converted to sockets: they don't occupy widgets_values.
+  const socketInputNames = new Set((node.inputs ?? []).map(i => i.name));
+  let valueIndex = 0;
+
+  for (const section of [info.input.required, info.input.optional]) {
+    if (!section) continue;
+    for (const inputName of Object.keys(section)) {
+      const def = section[inputName];
+      // IT: salta socket e input forzati a collegamento: non occupano widgets_values.
+      // EN: skip sockets and force-input inputs: they don't occupy widgets_values.
+      if (!isWidgetInput(def) || socketInputNames.has(inputName)) continue;
+      if (valueIndex >= values.length) return map;
+
+      map[inputName] = values[valueIndex++];
+
+      // IT: dopo un seed intero, salta l'eventuale valore di control_after_generate.
+      // EN: after an integer seed, skip the possible control_after_generate value.
+      if (getInputType(def) === 'INT' && isSeedInput(inputName)
+          && valueIndex < values.length && SEED_CONTROL_VALUES.has(String(values[valueIndex]))) {
+        valueIndex++;
+      }
+    }
+  }
+  return map;
+}
+
+// IT: Estrae i parametri da un sampler "custom" (SamplerCustom / SamplerCustomAdvanced), i cui
+//     valori sono sparsi su nodi collegati: lo scheduler (sigmas), il selettore (sampler) e il
+//     guider (cfg). I valori vengono letti per NOME dei widget, così da gestire le varie varianti.
+// EN: Extracts parameters from a "custom" sampler (SamplerCustom / SamplerCustomAdvanced), whose
+//     values are spread across connected nodes: the scheduler (sigmas), the selector (sampler) and
+//     the guider (cfg). Values are read by widget NAME, to handle the various variants.
+function extractCustomSamplerParameters(
+  node: LGraphNode,
+  objectInfo: Record<string, ComfyNodeInfo>,
+  nodesById: Map<number, LGraphNode>,
+  linksById: Map<number, LLink>,
+): SamplerParameters {
+  const sigmasNode = followInput(node, 'sigmas', nodesById, linksById);     // IT: scheduler. EN: scheduler.
+  const samplerSelectNode = followInput(node, 'sampler', nodesById, linksById); // IT: es. KSamplerSelect. EN: e.g. KSamplerSelect.
+  const guiderNode = followInput(node, 'guider', nodesById, linksById);     // IT: es. CFGGuider (solo Advanced). EN: e.g. CFGGuider (Advanced only).
+
+  const sigmasWidgets = sigmasNode ? buildWidgetMap(sigmasNode, objectInfo) : {};
+  const samplerWidgets = samplerSelectNode ? buildWidgetMap(samplerSelectNode, objectInfo) : {};
+  const guiderWidgets = guiderNode ? buildWidgetMap(guiderNode, objectInfo) : {};
+  const ownWidgets = buildWidgetMap(node, objectInfo); // IT: SamplerCustom tiene cfg/seed sul nodo stesso. EN: SamplerCustom keeps cfg/seed on the node itself.
+
+  return {
+    id: String(node.id),
+    nodeTitle: node.title || node.type,
+    steps: sigmasWidgets.steps as number | undefined,
+    cfg: (guiderWidgets.cfg ?? ownWidgets.cfg) as number | undefined,
+    samplerName: samplerWidgets.sampler_name as string | undefined,
+    scheduler: sigmasWidgets.scheduler as string | undefined,
+  };
 }
 
 // IT: Estrae la stringa JSON del workflow da metadati di file audio/video o immagini.
@@ -177,6 +301,10 @@ export async function extractAndNormalizeWorkflow(
       // EN: Extract key workflow parameters.
       const widgetValues = node.widgets_values;
       if (widgetValues) {
+        // IT: FALLBACK basato sul titolo. Usato solo se il tracciamento via link (più sotto) non
+        //     trova nulla — utile per i workflow che non espongono i link degli input.
+        // EN: Title-based FALLBACK. Only used if link tracing (below) finds nothing —
+        //     useful for workflows that don't expose input links.
         if (node.type.includes('CLIPTextEncode') && node.title?.toLowerCase().includes('positive')) {
           parameters.positivePrompt = widgetValues[0] || parameters.positivePrompt;
         } else if (node.type.includes('CLIPTextEncode') && node.title?.toLowerCase().includes('negative')) {
@@ -195,7 +323,39 @@ export async function extractAndNormalizeWorkflow(
         }
       }
     });
-      
+
+    // IT: Estrazione robusta dei prompt: invece di affidarsi al titolo del nodo, parte dal nodo
+    //     di campionamento (quello con input 'positive' e 'negative') e segue i collegamenti
+    //     fino al nodo testuale di origine. Ha priorità sul fallback basato sul titolo.
+    // EN: Robust prompt extraction: instead of relying on the node title, it starts from the
+    //     sampler node (the one with 'positive' and 'negative' inputs) and follows the links
+    //     back to the source text node. It takes priority over the title-based fallback.
+    const nodesById = new Map<number, LGraphNode>(nodes.map(n => [n.id, n]));
+    const linksById = new Map<number, LLink>();
+    for (const link of links) {
+      if (Array.isArray(link)) linksById.set(link[0], link); // IT: link[0] = id del collegamento. EN: link[0] = link id.
+    }
+
+    const samplerNode = nodes.find(
+      n => n.inputs?.some(i => i.name === 'positive') && n.inputs?.some(i => i.name === 'negative')
+    );
+    if (samplerNode) {
+      const tracedPositive = traceTextFromInput(samplerNode, 'positive', nodesById, linksById);
+      const tracedNegative = traceTextFromInput(samplerNode, 'negative', nodesById, linksById);
+      if (tracedPositive !== undefined) parameters.positivePrompt = tracedPositive;
+      if (tracedNegative !== undefined) parameters.negativePrompt = tracedNegative;
+    }
+
+    // IT: Parametri dei sampler "custom" (pipeline moderna): i valori sono su nodi collegati,
+    //     quindi vanno raccolti seguendo i link. I KSampler classici sono già gestiti nel ciclo sopra.
+    // EN: "Custom" sampler parameters (modern pipeline): values live on connected nodes,
+    //     so they are gathered by following links. Classic KSamplers are handled in the loop above.
+    for (const node of nodes) {
+      if (node.type === 'SamplerCustom' || node.type === 'SamplerCustomAdvanced') {
+        parameters.samplers.push(extractCustomSamplerParameters(node, objectInfo, nodesById, linksById));
+      }
+    }
+
     // IT: Restituisce workflow normalizzato con i parametri.
     // EN: Return normalized workflow with parameters.
     return { nodes, links, groups, nodeList, notes: extractedNotes, parameters };

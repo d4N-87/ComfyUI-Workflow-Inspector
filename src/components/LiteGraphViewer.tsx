@@ -49,7 +49,11 @@ const LiteGraphViewer: React.FC<LiteGraphViewerProps> = ({ graphData, highlighte
       // EN: Canvas interaction configuration.
       canvas.allow_interaction = true;
       canvas.allow_dragcanvas = true;
-      canvas.allow_dragnodes = false; // IT: Nodi non trascinabili. EN: Nodes not draggable.
+      // IT: Trascinamento nodi attivo (stile ComfyUI). In litegraph il toggle di collasso (click sul
+      //     titolo) è agganciato a questo flag, quindi così si possono anche aprire/chiudere i nodi.
+      // EN: Node dragging enabled (ComfyUI-style). In litegraph the collapse toggle (title click) is
+      //     tied to this flag, so this also lets nodes be expanded/collapsed.
+      canvas.allow_dragnodes = true;
       
       // IT: Disabilita la ricerca nodi (doppio click) e il menu contestuale (tasto destro).
       // EN: Disable node search (double-click) and context menu (right-click).

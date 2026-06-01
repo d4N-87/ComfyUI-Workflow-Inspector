@@ -2,10 +2,49 @@
 
 import { LiteGraph } from 'litegraph.js';
 import type { LGraphNode as LGraphNodeInterface, SubgraphDefinition } from '../types/comfy';
+import {
+  isWidgetInput,
+  getInputType,
+  getInputConfig,
+  isSeedInput,
+  SEED_CONTROL_VALUES,
+  type InputDefinition,
+} from './comfyWidgets';
 
 // IT: Flag per evitare registrazioni multiple.
 // EN: Flag to prevent multiple registrations.
 let hasBeenRegistered = false;
+
+// IT: Aggiunge a un nodo il widget corretto per un input ComfyUI di tipo "valore", scegliendo
+//     il widget LiteGraph adatto (numero, menù, testo, interruttore). Dopo un seed intero aggiunge
+//     anche il widget "control_after_generate", come fa ComfyUI, per mantenere l'allineamento dei
+//     valori salvati in widgets_values.
+// EN: Adds to a node the correct widget for a "value" ComfyUI input, picking the right LiteGraph
+//     widget (number, combo, text, toggle). After an integer seed it also adds the
+//     "control_after_generate" widget, as ComfyUI does, to keep saved widgets_values aligned.
+function addComfyWidget(node: LGraphNodeInterface, name: string, def: InputDefinition): void {
+  const type = getInputType(def);
+  const config = getInputConfig(def) ?? {};
+  const noop = () => {};
+
+  if (Array.isArray(type) || type === 'COMBO') {
+    // IT: menù a tendina (combo): opzioni dall'array (vecchio formato) o da config.options (recente).
+    // EN: dropdown (combo): options from the array (old format) or from config.options (recent).
+    const values = (Array.isArray(type) ? type : (config.options as unknown[])) ?? [];
+    node.addWidget('combo', name, config.default ?? values[0], noop, { values });
+  } else if (type === 'INT' || type === 'FLOAT') {
+    node.addWidget('number', name, config.default ?? 0, noop, {});
+    if (type === 'INT' && isSeedInput(name)) {
+      node.addWidget('combo', 'control_after_generate', 'randomize', noop, { values: [...SEED_CONTROL_VALUES] });
+    }
+  } else if (type === 'BOOLEAN') {
+    node.addWidget('toggle', name, config.default ?? false, noop, {});
+  } else {
+    // IT: STRING e altri tipi-valore testuali.
+    // EN: STRING and other textual value types.
+    node.addWidget('text', name, config.default ?? '', noop, {});
+  }
+}
 
 // IT: Registra i tipi di nodo ComfyUI in LiteGraph.
 // EN: Registers ComfyUI node types in LiteGraph.
@@ -29,12 +68,23 @@ export function registerComfyNodes(objectInfo: Record<string, any>): void {
     // IT: Costruttore per nodi generici.
     // EN: Constructor for generic nodes.
     const NodeConstructor = function(this: LGraphNodeInterface) {
-      // IT: Aggiunge input richiesti.
-      // EN: Add required inputs.
-      if (nodeInfo.input?.required) for (const inputName in nodeInfo.input.required) this.addInput(inputName, nodeInfo.input.required[inputName][0]);
-      // IT: Aggiunge input opzionali.
-      // EN: Add optional inputs.
-      if (nodeInfo.input?.optional) for (const inputName in nodeInfo.input.optional) this.addInput(inputName, nodeInfo.input.optional[inputName][0]);
+      // IT: Scorre gli input nell'ordine di ComfyUI (prima required, poi optional). Gli input di
+      //     tipo "valore" diventano widget dentro il nodo; gli altri restano socket (collegamenti).
+      //     Questo rende l'anteprima molto più fedele a ComfyUI rispetto a "tutto socket".
+      // EN: Iterates inputs in ComfyUI's order (required first, then optional). "Value" inputs
+      //     become widgets inside the node; the others remain sockets (links).
+      //     This makes the preview far more faithful to ComfyUI than "everything as sockets".
+      for (const section of [nodeInfo.input?.required, nodeInfo.input?.optional]) {
+        if (!section) continue;
+        for (const inputName in section) {
+          const def = section[inputName];
+          if (isWidgetInput(def)) {
+            addComfyWidget(this, inputName, def);
+          } else {
+            this.addInput(inputName, getInputType(def) as string);
+          }
+        }
+      }
       // IT: Aggiunge output.
       // EN: Add outputs.
       if (nodeInfo.output) {
@@ -70,8 +120,19 @@ export function registerComfyNodes(objectInfo: Record<string, any>): void {
 
 
   // IT: FASE 3: Registrazione per "PrimitiveNode".
+  //     Il valore di una primitiva è salvato in widgets_values; al caricamento creiamo un widget
+  //     di testo per ciascun valore, così il nodo non appare vuoto (es. Width/Height, prompt...).
   // EN: PHASE 3: Registration for "PrimitiveNode".
-  const PrimitiveNodeConstructor = function(this: LGraphNodeInterface) { /* IT: Costruttore vuoto. EN: Empty constructor. */ };
+  //     A primitive's value lives in widgets_values; on load we create a text widget for each value
+  //     so the node isn't empty (e.g. Width/Height, prompt...).
+  const PrimitiveNodeConstructor = function(this: LGraphNodeInterface) {
+    this.onConfigure = function() {
+      if (!Array.isArray(this.widgets_values)) return;
+      for (const value of this.widgets_values) {
+        this.addWidget("text", "", value, () => {});
+      }
+    };
+  };
   LiteGraph.registerNodeType("PrimitiveNode", PrimitiveNodeConstructor as any);
   console.log("✅ Registrazione specifica per 'PrimitiveNode' completata.");
 
