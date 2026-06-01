@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 import { extractAndNormalizeWorkflow, WorkflowParseError } from './utils/workflowExtractor';
 import { registerComfyNodes } from './utils/litegraph-setup';
+import { assetUrl } from './utils/paths';
 import LiteGraphViewer from './components/LiteGraphViewer';
 import WorkflowParametersDisplay from './components/WorkflowParameters';
 import NeuralNetwork from './components/NeuralNetwork';
@@ -52,7 +53,7 @@ function App() {
         // Necessario per il corretto funzionamento sia in locale che su GitHub Pages (sottocartella).
         // EN: Constructs the path for object_info.json considering Vite's BASE_URL.
         // Necessary for correct operation both locally and on GitHub Pages (subfolder).
-        const objectInfoPath = `${import.meta.env.BASE_URL}object_info.json`.replace(/\/\//g, '/');
+        const objectInfoPath = assetUrl('object_info.json');
         const response = await fetch(objectInfoPath);
         
         if (!response.ok) {
@@ -196,6 +197,7 @@ function App() {
           <select
             onChange={changeLanguage}
             value={i18n.language.split('-')[0]}
+            aria-label={t('languageSelectorLabel')}
             className="bg-surface text-primary-text p-2 rounded-md border border-border focus:outline-none focus:ring-2 focus:ring-primary-accent"
           >
             {languageOptions.map((option) => (
@@ -210,7 +212,7 @@ function App() {
             <div className="flex-none mb-4 md:mb-0 md:mr-6">
               <a href={repositoryUrl} target="_blank" rel="noopener noreferrer" title={t('githubRepoLinkTooltip')}>
                 <img
-                  src={`${import.meta.env.BASE_URL}workflow_inspector_logo.webp`.replace(/\/\//g, '/')}
+                  src={assetUrl('workflow_inspector_logo.webp')}
                   alt="ComfyUI Workflow Inspector Logo"
                   className="h-24 md:h-26 lg:h-32 w-auto transition-opacity duration-300 hover:opacity-80 filter drop-shadow-[0_2px_2px_rgba(255,255,255,0.2)]"
                 />

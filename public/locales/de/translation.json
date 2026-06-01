@@ -26,5 +26,6 @@
   "footerPrivacyNote": "Ihre Dateien werden lokal in diesem Browser verarbeitet. Es werden keine Daten auf einen Server hochgeladen.",
   "githubRepoLinkTooltip": "Zum GitHub-Repository gehen",
   "dropOverlayTitle": "Datei hier ablegen",
-  "dropOverlayHint": "PNG, WebP, MP4, FLAC oder JSON"
+  "dropOverlayHint": "PNG, WebP, MP4, FLAC oder JSON",
+  "languageSelectorLabel": "Sprache auswählen"
 }

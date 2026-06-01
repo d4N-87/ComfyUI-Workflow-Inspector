@@ -11,6 +11,12 @@ import {
   type InputDefinition,
 } from './comfyWidgets';
 
+// IT: Log di diagnostica attivo solo in sviluppo: silenzioso nella build di produzione.
+// EN: Diagnostic log active only in development: silent in the production build.
+const debugLog = (...args: unknown[]): void => {
+  if (import.meta.env.DEV) console.log(...args);
+};
+
 // IT: Flag per evitare registrazioni multiple.
 // EN: Flag to prevent multiple registrations.
 let hasBeenRegistered = false;
@@ -53,7 +59,7 @@ export function registerComfyNodes(objectInfo: Record<string, any>): void {
     return;
   }
 
-  console.log("Inizio registrazione nodi ComfyUI...");
+  debugLog("Inizio registrazione nodi ComfyUI...");
 
   // IT: FASE 1: Registra nodi generici.
   // EN: PHASE 1: Register generic nodes.
@@ -94,7 +100,7 @@ export function registerComfyNodes(objectInfo: Record<string, any>): void {
     };
     LiteGraph.registerNodeType(nodeInfo.name, NodeConstructor as any);
   }
-  console.log("✅ Registrazione dei nodi generici completata.");
+  debugLog("✅ Registrazione dei nodi generici completata.");
 
 
   // IT: FASE 2: Registrazione per "Note" e "MarkdownNote".
@@ -114,9 +120,9 @@ export function registerComfyNodes(objectInfo: Record<string, any>): void {
     };
   };
   LiteGraph.registerNodeType("Note", createNoteConstructor() as any);
-  console.log("✅ Registrazione specifica per 'Note' completata.");
+  debugLog("✅ Registrazione specifica per 'Note' completata.");
   LiteGraph.registerNodeType("MarkdownNote", createNoteConstructor() as any); // IT: Usa stesso costruttore. EN: Uses same constructor.
-  console.log("✅ Registrazione specifica per 'MarkdownNote' completata.");
+  debugLog("✅ Registrazione specifica per 'MarkdownNote' completata.");
 
 
   // IT: FASE 3: Registrazione per "PrimitiveNode".
@@ -134,14 +140,14 @@ export function registerComfyNodes(objectInfo: Record<string, any>): void {
     };
   };
   LiteGraph.registerNodeType("PrimitiveNode", PrimitiveNodeConstructor as any);
-  console.log("✅ Registrazione specifica per 'PrimitiveNode' completata.");
+  debugLog("✅ Registrazione specifica per 'PrimitiveNode' completata.");
 
 
   // IT: FASE 4: Registrazione per "Reroute".
   // EN: PHASE 4: Registration for "Reroute".
   const RerouteNodeConstructor = function(this: LGraphNodeInterface) { /* IT: Costruttore vuoto. EN: Empty constructor. */ };
   LiteGraph.registerNodeType("Reroute", RerouteNodeConstructor as any);
-  console.log("✅ Registrazione specifica per 'Reroute' completata.");
+  debugLog("✅ Registrazione specifica per 'Reroute' completata.");
 
   hasBeenRegistered = true;
 }
@@ -155,7 +161,7 @@ export function registerDynamicNode(subgraphDef: SubgraphDefinition): void {
     return;
   }
 
-  console.log(`Registrazione dinamica del nodo: ${subgraphDef.name} (${subgraphDef.id})`);
+  debugLog(`Registrazione dinamica del nodo: ${subgraphDef.name} (${subgraphDef.id})`);
 
   // IT: Costruttore per il nodo Subgraph.
   // EN: Constructor for the Subgraph node.
@@ -171,5 +177,5 @@ export function registerDynamicNode(subgraphDef: SubgraphDefinition): void {
   };
 
   LiteGraph.registerNodeType(subgraphDef.id, SubgraphNodeConstructor as any);
-  console.log(`✅ Nodo ${subgraphDef.name} registrato dinamicamente.`);
+  debugLog(`✅ Nodo ${subgraphDef.name} registrato dinamicamente.`);
 }

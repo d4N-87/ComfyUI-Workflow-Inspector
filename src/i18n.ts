@@ -3,12 +3,11 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpApi from 'i18next-http-backend';
+import { assetUrl } from './utils/paths';
 
-// IT: Costruisce il percorso base per i file di traduzione.
-// Utilizza import.meta.env.BASE_URL per la compatibilità con deploy in sottocartelle (es. GitHub Pages).
-// EN: Constructs the base path for translation files.
-// Uses import.meta.env.BASE_URL for compatibility with subfolder deployments (e.g., GitHub Pages).
-const loadPathBase = `${import.meta.env.BASE_URL}locales/{{lng}}/{{ns}}.json`.replace(/\/\//g, '/');
+// IT: Percorso base dei file di traduzione, compatibile con i deploy in sottocartella (GitHub Pages).
+// EN: Base path for translation files, compatible with subfolder deployments (GitHub Pages).
+const loadPathBase = assetUrl('locales/{{lng}}/{{ns}}.json');
 
 i18n
   .use(HttpApi) // IT: Carica traduzioni via HTTP (da file JSON). EN: Loads translations via HTTP (from JSON files).
