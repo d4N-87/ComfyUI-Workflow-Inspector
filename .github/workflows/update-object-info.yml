@@ -1,0 +1,128 @@
+# .github/workflows/update-object-info.yml
+#
+# IT: Rigenera automaticamente public/object_info.json dai nodi CORE di ComfyUI (versione vanilla,
+#     ultima release stabile), poi committa e fa il deploy. Toglie l'aggiornamento manuale del file.
+# EN: Automatically regenerates public/object_info.json from ComfyUI's CORE nodes (vanilla, latest
+#     stable release), then commits and deploys. Removes the manual update of the file.
+
+name: Update object_info from ComfyUI
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # IT: ogni lunedì 06:00 UTC. EN: every Monday at 06:00 UTC.
+  workflow_dispatch:      # IT: avvio manuale dalla tab Actions. EN: manual run from the Actions tab.
+
+permissions:
+  contents: write # IT: per committare il file aggiornato. EN: to commit the updated file.
+  pages: write    # IT: per il deploy su Pages. EN: for the Pages deployment.
+  id-token: write
+
+# IT: Condivide il gruppo "pages" con il workflow di deploy per evitare deploy sovrapposti.
+# EN: Shares the "pages" group with the deploy workflow to avoid overlapping deployments.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  update-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v6
+
+      # IT: Trova l'ultima release stabile di ComfyUI.
+      # EN: Resolve the latest stable ComfyUI release.
+      - name: Resolve latest ComfyUI release
+        id: comfy
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=$(gh api repos/comfyanonymous/ComfyUI/releases/latest --jq .tag_name)
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "ComfyUI release: $TAG"
+
+      - name: Clone ComfyUI (stable release)
+        run: git clone --depth 1 --branch "${{ steps.comfy.outputs.tag }}" https://github.com/comfyanonymous/ComfyUI.git comfyui
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # IT: Installa torch CPU PRIMA, così pip non scarica i pesanti wheel CUDA, poi le altre dipendenze.
+      # EN: Install CPU torch FIRST, so pip doesn't download the heavy CUDA wheels, then the rest.
+      - name: Install ComfyUI dependencies (CPU only)
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+          pip install -r comfyui/requirements.txt
+
+      # IT: Avvia ComfyUI in modalità CPU (senza modelli) e scarica /object_info appena risponde.
+      # EN: Start ComfyUI in CPU mode (no models) and fetch /object_info as soon as it responds.
+      - name: Generate object_info.json
+        run: |
+          python comfyui/main.py --cpu --port 8188 > comfyui.log 2>&1 &
+          SERVER_PID=$!
+          ok=0
+          for i in $(seq 1 60); do
+            if curl -sf http://127.0.0.1:8188/object_info -o object_info.new.json; then ok=1; break; fi
+            sleep 5
+          done
+          kill "$SERVER_PID" 2>/dev/null || true
+          if [ "$ok" != "1" ]; then
+            echo "::error::ComfyUI non ha risposto entro il tempo limite / ComfyUI did not respond in time"
+            tail -n 80 comfyui.log
+            exit 1
+          fi
+          # IT: Validazione minima prima di sovrascrivere il file reale. EN: Minimal validation before overwriting the real file.
+          python -c "import json; d=json.load(open('object_info.new.json')); assert 'KSampler' in d, 'KSampler mancante'; assert len(d) > 100, 'troppi pochi nodi'; print('object_info OK:', len(d), 'nodi')"
+          mv object_info.new.json public/object_info.json
+
+      # IT: Committa e fa push solo se il file è effettivamente cambiato.
+      # EN: Commit and push only if the file actually changed.
+      - name: Commit & push if changed
+        id: regen
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/object_info.json
+          if git diff --staged --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Nessun cambiamento in object_info.json / No changes in object_info.json"
+          else
+            git commit -m "chore: update object_info from ComfyUI ${{ steps.comfy.outputs.tag }}"
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # --- IT: I passaggi seguenti girano solo se object_info è cambiato. EN: The steps below run only if object_info changed. ---
+      - name: Set up Node.js
+        if: steps.regen.outputs.changed == 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies & build
+        if: steps.regen.outputs.changed == 'true'
+        run: |
+          npm ci
+          npm run build
+
+      - name: Setup Pages
+        if: steps.regen.outputs.changed == 'true'
+        uses: actions/configure-pages@v6
+
+      - name: Upload build artifact
+        if: steps.regen.outputs.changed == 'true'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: './dist'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        if: steps.regen.outputs.changed == 'true'
+        uses: actions/deploy-pages@v5
