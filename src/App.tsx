@@ -1,6 +1,6 @@
 // src/App.tsx
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { ChangeEvent } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -34,6 +34,12 @@ function App() {
   const [objectInfo, setObjectInfo] = useState<Record<string, ComfyNodeInfo> | null>(null);
   const [isAppReady, setIsAppReady] = useState(false);
   const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
+  // IT: True mentre si trascina un file sopra la pagina (mostra l'overlay "rilascia qui").
+  // EN: True while dragging a file over the page (shows the "drop here" overlay).
+  const [isDragging, setIsDragging] = useState(false);
+  // IT: Contatore per evitare lo sfarfallio dell'overlay entrando/uscendo dagli elementi figli.
+  // EN: Counter to avoid overlay flicker when entering/leaving child elements.
+  const dragCounter = useRef(0);
 
   const repositoryUrl = "https://github.com/d4N-87/ComfyUI-Workflow-Inspector"; 
 
@@ -64,15 +70,14 @@ function App() {
     initializeApp();
   }, [t]); // IT: La dipendenza da 't' è per ri-tradurre i messaggi di errore se la lingua cambia. EN: Dependency on 't' is to re-translate error messages if language changes.
 
-  // IT: Gestisce il cambio del file di input.
-  // EN: Handles input file change.
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  // IT: Logica di caricamento condivisa: usata sia dal pulsante sia dal drag & drop.
+  // EN: Shared loading logic: used by both the button and drag & drop.
+  const processFile = async (file: File) => {
     setFileName(null);
     setErrorMessage(null);
     setWorkflow(null);
 
-    const file = event.target.files?.[0];
-    if (!file || !objectInfo) return; // IT: Esce se non c'è file o objectInfo non è pronto. EN: Exit if no file or objectInfo not ready.
+    if (!objectInfo) return; // IT: Esce se objectInfo non è pronto. EN: Exit if objectInfo isn't ready.
     setFileName(file.name);
 
     try {
@@ -87,6 +92,66 @@ function App() {
       setErrorMessage(t('errorUnexpected'));
     }
   };
+
+  // IT: Gestisce il cambio del file dal pulsante di caricamento.
+  // EN: Handles file change from the upload button.
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) processFile(file);
+  };
+
+  // IT: Riferimenti sempre aggiornati, per evitare closure obsolete nei listener globali.
+  // EN: Always-current refs, to avoid stale closures in the global listeners.
+  const processFileRef = useRef(processFile);
+  processFileRef.current = processFile;
+  const isAppReadyRef = useRef(isAppReady);
+  isAppReadyRef.current = isAppReady;
+
+  // IT: Drag & drop a livello di window. Intercettare gli eventi sull'intera finestra (e non su un
+  //     singolo div) è necessario perché il file può essere rilasciato sopra il canvas di litegraph,
+  //     che altrimenti lascerebbe partire il comportamento di default del browser (apre il file).
+  // EN: Window-level drag & drop. Listening on the whole window (not a single div) is necessary
+  //     because the file can be dropped over the litegraph canvas, which would otherwise let the
+  //     browser's default behavior run (opening the file).
+  useEffect(() => {
+    const onDragEnter = (e: DragEvent) => {
+      e.preventDefault();
+      if (!isAppReadyRef.current) return;
+      dragCounter.current += 1;
+      // IT: Mostra l'overlay solo se si trascinano dei file. EN: Show the overlay only when dragging files.
+      if (e.dataTransfer && Array.from(e.dataTransfer.types).includes('Files')) setIsDragging(true);
+    };
+    const onDragOver = (e: DragEvent) => {
+      e.preventDefault(); // IT: necessario per abilitare il drop. EN: required to enable dropping.
+    };
+    const onDragLeave = (e: DragEvent) => {
+      e.preventDefault();
+      dragCounter.current -= 1;
+      if (dragCounter.current <= 0) {
+        dragCounter.current = 0;
+        setIsDragging(false);
+      }
+    };
+    const onDrop = (e: DragEvent) => {
+      e.preventDefault();
+      dragCounter.current = 0;
+      setIsDragging(false);
+      if (!isAppReadyRef.current) return;
+      const file = e.dataTransfer?.files?.[0];
+      if (file) processFileRef.current(file);
+    };
+
+    window.addEventListener('dragenter', onDragEnter);
+    window.addEventListener('dragover', onDragOver);
+    window.addEventListener('dragleave', onDragLeave);
+    window.addEventListener('drop', onDrop);
+    return () => {
+      window.removeEventListener('dragenter', onDragEnter);
+      window.removeEventListener('dragover', onDragOver);
+      window.removeEventListener('dragleave', onDragLeave);
+      window.removeEventListener('drop', onDrop);
+    };
+  }, []);
 
   // IT: Cambia la lingua dell'interfaccia.
   // EN: Changes the interface language.
@@ -106,6 +171,16 @@ function App() {
 
   return (
     <div className="bg-background text-primary-text min-h-screen flex flex-col font-sans antialiased relative">
+      {/* IT: Overlay mostrato durante il trascinamento di un file. EN: Overlay shown while dragging a file. */}
+      {isDragging && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm border-4 border-dashed border-primary-accent pointer-events-none">
+          <div className="text-center px-6">
+            <p className="text-3xl font-bold text-primary-accent">{t('dropOverlayTitle')}</p>
+            <p className="text-secondary-text mt-2 text-lg">{t('dropOverlayHint')}</p>
+          </div>
+        </div>
+      )}
+
       {/* Background container with the animation and a gradient overlay */}
       <div className="fixed inset-0 z-0">
         <NeuralNetwork />

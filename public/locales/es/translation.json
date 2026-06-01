@@ -23,5 +23,7 @@
   "footerNote": "Nota: La visualización del flujo de trabajo es una representación esquemática para inspeccionar el flujo y la posición de los nodos. No es una interfaz interactiva. Para una visualización completa, abra el archivo en ComfyUI.",
   "footerRepoLink": "ComfyUI-Workflow-Inspector en GitHub",
   "footerPrivacyNote": "Tus archivos se procesan localmente en este navegador. Ningún dato se sube a ningún servidor.",
-  "githubRepoLinkTooltip": "Ir al repositorio de GitHub"
+  "githubRepoLinkTooltip": "Ir al repositorio de GitHub",
+  "dropOverlayTitle": "Suelta el archivo aquí",
+  "dropOverlayHint": "PNG, WebP, MP4, FLAC o JSON"
 }
